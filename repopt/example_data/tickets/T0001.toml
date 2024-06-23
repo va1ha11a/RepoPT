@@ -1,0 +1,26 @@
+[project]
+id = "P0001"
+
+[ticket]
+id = "T0001"
+title = "Implement TOML configuration parsing"
+status = "Open"
+priority = "High"
+type = "Feature"
+
+[assignee]
+name = "Jane Doe"
+email = "jane.doe@example.com"
+
+[tags]
+0 = "parser"
+1 = "configuration"
+2 = "TOML"
+
+[estimated_time]
+hours = 8
+minutes = 30
+
+[dependencies]
+"toml" = "0.5"
+"serde" = "1.0"
