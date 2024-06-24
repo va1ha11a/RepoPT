@@ -7,11 +7,11 @@ use std::collections::HashMap;
 #[derive(Deserialize, Debug)]
 pub(crate) struct Project {
     pub(crate) id: String,
-    pub(crate) name: String,
-    pub(crate) description: String,
+    name: String,
+    description: String,
     // Other fields...
     #[serde(flatten)]
-    pub(crate) extra: HashMap<String, Value>,
+    extra: HashMap<String, Value>,
 }
 
 #[allow(dead_code)]
@@ -46,21 +46,21 @@ pub(crate) enum TicketType {
 #[derive(Deserialize, Debug)]
 pub(crate) struct Ticket {
     pub(crate) id: String,
-    pub(crate) title: String,
-    pub(crate) status: TicketStatus,
+    title: String,
+    status: TicketStatus,
     #[serde(rename = "type")]
-    pub(crate) ticket_type: TicketType,
-    pub(crate) project: ProjectStub,
+    ticket_type: TicketType,
+    project: ProjectStub,
     // Other fields...
     #[serde(flatten)]
-    pub(crate) extra: HashMap<String, Value>,
+    extra: HashMap<String, Value>,
 }
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
-    pub(crate) projects: HashMap<String, Project>,
-    pub(crate) tickets: HashMap<String, Ticket>,
+    projects: HashMap<String, Project>,
+    tickets: HashMap<String, Ticket>,
 }
 
 impl InRepoDB {
