@@ -57,7 +57,14 @@ pub(crate) struct Ticket {
 }
 
 #[allow(dead_code)]
-struct InRepoDB {
-    projects: HashMap<String, Project>,
-    tickets: HashMap<String, Ticket>,
+#[derive(Deserialize, Debug)]
+pub(crate) struct InRepoDB {
+    pub(crate) projects: HashMap<String, Project>,
+    pub(crate) tickets: HashMap<String, Ticket>,
+}
+
+impl InRepoDB {
+    pub fn new(projects: HashMap<String, Project>, tickets: HashMap<String, Ticket>) -> Self {
+        InRepoDB { projects, tickets }
+    }
 }

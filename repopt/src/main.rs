@@ -1,20 +1,43 @@
-mod project_data;
-
-use project_data::{Project, Ticket};
+use std::collections::HashMap;
 use std::fs;
+use std::path::Path;
+
+mod project_data;
+mod toml_utils;
+
+use project_data::{InRepoDB, Project, Ticket};
+
+const BASE_DIR: &str = "example_data";
+const PROJECTS_DIR: &str = "projects";
+const TICKETS_DIR: &str = "tickets";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Read the TOML file
-    let proj_contents = fs::read_to_string("example_data/projects/P0001.toml")?;
-    let ticket_contents = fs::read_to_string("example_data/tickets/T0001.toml")?;
+    let base_path = Path::new(BASE_DIR);
+    let project_path = base_path.join(PROJECTS_DIR);
+    let ticket_path = base_path.join(TICKETS_DIR);
 
-    // Deserialize the TOML string into the Project struct
-    let project: Project = toml::from_str(&proj_contents)?;
-    let ticket: Ticket = toml::from_str(&ticket_contents)?;
+    let project_files = toml_utils::get_toml_files_in_dir(&project_path)?;
+    let ticket_files = toml_utils::get_toml_files_in_dir(&ticket_path)?;
+
+    let mut projects = HashMap::new();
+    for proj_file in project_files {
+        let proj_contents = fs::read_to_string(&proj_file)?;
+        let project: Project = toml::from_str(&proj_contents)?;
+        projects.insert(project.id.clone(), project);
+    }
+
+    let mut tickets = HashMap::new();
+    for ticket_file in ticket_files {
+        let ticket_contents = fs::read_to_string(&ticket_file)?;
+        let ticket: Ticket = toml::from_str(&ticket_contents)?;
+        tickets.insert(ticket.id.clone(), ticket);
+    }
+
+    let in_repo_db = InRepoDB::new(projects, tickets);
 
     // Use the deserialized data (example)
-    println!("{:#?}", project);
+    println!("{:#?}", &in_repo_db.projects);
+    println!("{:#?}", &in_repo_db.tickets);
 
-    println!("{:#?}", ticket);
     Ok(())
 }
