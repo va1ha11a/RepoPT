@@ -1,30 +1,4 @@
-mod project_data {
-    use serde::Deserialize;
-    use serde_json::Value;
-    use std::collections::HashMap;
-
-    #[derive(Deserialize)]
-    pub(crate) struct Project {
-        pub(crate) id: String,
-        pub(crate) name: String,
-        pub(crate) description: String,
-        // Other fields...
-        #[serde(flatten)]
-        pub(crate) extra: HashMap<String, Value>,
-    }
-
-    #[derive(Deserialize)]
-    pub(crate) struct Ticket {
-        pub(crate) id: String,
-        pub(crate) title: String,
-        pub(crate) status: String,
-        #[serde(rename = "type")]
-        pub(crate) ticket_type: String,
-        // Other fields...
-        #[serde(flatten)]
-        pub(crate) extra: HashMap<String, Value>,
-    }
-}
+mod project_data;
 
 use project_data::{Project, Ticket};
 use std::fs;
@@ -39,16 +13,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ticket: Ticket = toml::from_str(&ticket_contents)?;
 
     // Use the deserialized data (example)
-    println!("Project ID: {}", project.id);
-    println!("Project Name: {}", project.name);
-    println!("Project Description: {}", project.description);
-    println!("Extra fields: {:?}", project.extra);
+    println!("{:#?}", project);
 
-    println!("Ticket ID: {}", ticket.id);
-    println!("Ticket Title: {}", ticket.title);
-    println!("Ticket Status: {}", ticket.status);
-    println!("Ticket Type: {}", ticket.ticket_type);
-    println!("Extra fields: {:?}", ticket.extra);
-
+    println!("{:#?}", ticket);
     Ok(())
 }
