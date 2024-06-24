@@ -1,6 +1,6 @@
-id = "T0001"
-title = "Implement TOML configuration parsing"
-status = "Closed"
+id = "T0002"
+title = "Implement TOML configuration parsing in a much cooler way"
+status = "Open"
 type = "Feature"
 
 [project]

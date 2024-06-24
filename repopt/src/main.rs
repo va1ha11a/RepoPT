@@ -36,7 +36,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let in_repo_db = InRepoDB::new(projects, tickets);
 
     // Use the deserialized data (example)
-    println!("{:#?}", &in_repo_db);
+    // println!("{:#?}", &in_repo_db);
+
+    // println!("{:#?}", &in_repo_db.get_project("P0001"));
+    // println!("{:#?}", &in_repo_db.get_project("P0038"));
+    // println!("{:#?}", &in_repo_db.get_ticket("T0001"));
+    // println!("{:#?}", &in_repo_db.get_ticket("T0038"));
+    // println!("{:#?}", &in_repo_db.get_tickets_for_project("P0001"));
+    println!("{:#?}", &in_repo_db.get_open_tickets());
 
     Ok(())
 }
