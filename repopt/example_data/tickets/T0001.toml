@@ -1,12 +1,11 @@
-[project]
-id = "P0001"
-
-[ticket]
 id = "T0001"
 title = "Implement TOML configuration parsing"
 status = "Open"
 priority = "High"
 type = "Feature"
+
+[project]
+id = "P0001"
 
 [assignee]
 name = "Jane Doe"
