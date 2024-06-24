@@ -1,0 +1,15 @@
+id = "T0003"
+title = "Get some 3 way action"
+status = "Open"
+type = "Bug"
+
+[project]
+id = "P0002"
+
+[assignee]
+name = "Jane Doe"
+email = "jane.doe@example.com"
+
+[estimated_time]
+hours = 8
+minutes = 30
