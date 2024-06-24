@@ -57,6 +57,17 @@ pub(crate) struct Ticket {
 }
 
 #[allow(dead_code)]
+impl Ticket {
+    pub(crate) fn is_open(&self) -> bool {
+        self.status == TicketStatus::Open
+    }
+
+    pub(crate) fn get_project_id(&self) -> &str {
+        &self.project.id
+    }
+}
+
+#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
     projects: HashMap<String, Project>,
@@ -77,17 +88,7 @@ impl InRepoDB {
         self.tickets.get(id)
     }
 
-    pub fn get_tickets_for_project(&self, project_id: &str) -> Vec<&Ticket> {
-        self.tickets
-            .values()
-            .filter(|ticket| ticket.project.id == project_id)
-            .collect()
-    }
-
-    pub fn get_open_tickets(&self) -> Vec<&Ticket> {
-        self.tickets
-            .values()
-            .filter(|ticket| ticket.status == TicketStatus::Open)
-            .collect()
+    pub fn iter_tickets(&self) -> impl Iterator<Item = &Ticket> {
+        self.tickets.values()
     }
 }
