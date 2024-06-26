@@ -2,7 +2,10 @@ mod in_repo_db;
 mod in_repo_db_structs;
 mod toml_utils;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
+type Result<T> = std::result::Result<T, Error>;
+
+fn main() -> Result<()> {
     let in_repo_db = in_repo_db::collect_in_repo_db()?;
 
     // Use the deserialized data (example)
