@@ -1,4 +1,5 @@
 use crate::in_repo_db;
+use crate::in_repo_db_structs::{TicketFilters, TicketStatus, TicketType};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
@@ -8,6 +9,8 @@ pub(super) fn list_all_tickets() -> Result<()> {
     let in_repo_db = in_repo_db::collect_in_repo_db();
     Ok(in_repo_db?
         .iter_tickets()
+        //.with_status(&TicketStatus::Open)
+        //.with_type(&TicketType::Bug)
         .for_each(|t| println!("{:#?}", t)))
 }
 

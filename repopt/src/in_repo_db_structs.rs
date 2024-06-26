@@ -30,7 +30,7 @@ pub(crate) enum TicketStatus {
     Closed,
 }
 
-#[derive(Display, Deserialize, Debug)]
+#[derive(Display, Deserialize, Debug, PartialEq, Eq)]
 pub(crate) enum TicketType {
     #[display(fmt = "Bug")]
     Bug,
@@ -92,3 +92,19 @@ impl InRepoDB {
         self.tickets.values()
     }
 }
+
+pub(super) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
+where
+    Self: 'a,
+{
+    fn with_status(self, status: &'a TicketStatus) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.status == *status))
+    }
+
+    fn with_type(self, ticket_type: &'a TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.ticket_type == *ticket_type))
+    }
+}
+
+// Implement the trait for all iterators that return a ticket reference with the same lifetime
+impl<'a, T> TicketFilters<'a> for T where T: Iterator<Item = &'a Ticket> + 'a {}
