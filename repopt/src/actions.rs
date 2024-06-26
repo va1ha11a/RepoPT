@@ -3,7 +3,7 @@ use crate::in_repo_db;
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) fn list_all_tickets() -> Result<()> {
+pub(super) fn list_all_tickets() -> Result<()> {
     println!("Listing all tickets");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     Ok(in_repo_db?
@@ -11,7 +11,7 @@ pub(crate) fn list_all_tickets() -> Result<()> {
         .for_each(|t| println!("{:#?}", t)))
 }
 
-pub(crate) fn show_ticket(id: String) -> Result<()> {
+pub(super) fn show_ticket(id: String) -> Result<()> {
     println!("Showing a ticket with id: {id}");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
@@ -24,7 +24,7 @@ pub(crate) fn show_ticket(id: String) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn init_new_repository() -> Result<()> {
+pub(super) fn init_new_repository() -> Result<()> {
     println!("Initializing a new repository");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     // in_repo_db should be an error here

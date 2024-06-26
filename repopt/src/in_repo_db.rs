@@ -13,7 +13,7 @@ use std::path::PathBuf;
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) fn collect_in_repo_db() -> Result<InRepoDB> {
+pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
     let project_path = PathBuf::from(BASE_DIR).join(PROJECTS_DIR);
     let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
 
