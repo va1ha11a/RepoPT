@@ -16,7 +16,7 @@ enum BaseCommands {
     #[clap(name = "list", about = "List all tickets")]
     List,
     #[clap(name = "show", about = "Show a ticket")]
-    Show,
+    Show { id: String },
     #[clap(name = "edit", about = "Edit a ticket")]
     Edit,
     #[clap(name = "close", about = "Close a ticket")]
@@ -28,36 +28,15 @@ enum BaseCommands {
 fn main() -> Result<()> {
     let base_command = BaseCommands::parse();
 
-    let in_repo_db = in_repo_db::collect_in_repo_db();
-
     match base_command {
-        BaseCommands::Init => {
-            println!("Initializing a new repository");
-            // in_repo_db should be an error here
-            if in_repo_db.is_ok() {
-                return Err(From::from("Repository already exists."));
-            }
-        }
-        BaseCommands::Add => {
-            println!("Adding a new ticket");
-        }
-        BaseCommands::List => {
-            println!("Listing all tickets");
-            println!("{:#?}", in_repo_db?.iter_tickets().collect::<Vec<_>>());
-        }
-        BaseCommands::Show => {
-            println!("Showing a ticket");
-        }
-        BaseCommands::Edit => {
-            println!("Editing a ticket");
-        }
-        BaseCommands::Close => {
-            println!("Closing a ticket");
-        }
-        BaseCommands::Reopen => {
-            println!("Reopening a ticket");
-        }
-    }
+        BaseCommands::Init => init_new_repository(),
+        BaseCommands::Add => add_ticket(),
+        BaseCommands::List => list_all_tickets(),
+        BaseCommands::Show { id } => show_ticket(id),
+        BaseCommands::Edit => unimplemented!(),
+        BaseCommands::Close => unimplemented!(),
+        BaseCommands::Reopen => unimplemented!(),
+    }?;
 
     // Deserialize the data
     //let in_repo_db = in_repo_db::collect_in_repo_db()?;
@@ -81,4 +60,39 @@ fn main() -> Result<()> {
     // println!("{:#?}", tiks);
 
     Ok(())
+}
+
+fn list_all_tickets() -> Result<()> {
+    println!("Listing all tickets");
+    let in_repo_db = in_repo_db::collect_in_repo_db();
+    Ok(in_repo_db?
+        .iter_tickets()
+        .for_each(|t| println!("{:#?}", t)))
+}
+
+fn show_ticket(id: String) -> Result<()> {
+    println!("Showing a ticket with id: {id}");
+    let in_repo_db = in_repo_db::collect_in_repo_db();
+    let in_repo_db = in_repo_db?;
+    let ticket = in_repo_db.get_ticket(&id);
+    Ok(if let Some(ticket) = ticket {
+        println!("{:#?}", ticket);
+    } else {
+        return Err(From::from("Ticket not found."));
+    })
+}
+
+fn init_new_repository() -> Result<()> {
+    println!("Initializing a new repository");
+    let in_repo_db = in_repo_db::collect_in_repo_db();
+    // in_repo_db should be an error here
+    if in_repo_db.is_ok() {
+        return Err(From::from("Repository already exists."));
+    }
+    Ok(())
+}
+
+fn add_ticket() -> Result<()> {
+    // let in_repo_db = in_repo_db::collect_in_repo_db();
+    unimplemented!()
 }
