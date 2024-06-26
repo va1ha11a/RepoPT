@@ -16,11 +16,12 @@ pub(crate) fn show_ticket(id: String) -> Result<()> {
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
     let ticket = in_repo_db.get_ticket(&id);
-    Ok(if let Some(ticket) = ticket {
+    if let Some(ticket) = ticket {
         println!("{:#?}", ticket);
     } else {
         return Err(From::from("Ticket not found."));
-    })
+    };
+    Ok(())
 }
 
 pub(crate) fn init_new_repository() -> Result<()> {

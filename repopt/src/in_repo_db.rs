@@ -20,7 +20,7 @@ pub(crate) fn collect_in_repo_db() -> Result<InRepoDB> {
     let projects: HashMap<String, Project> = toml_utils::get_toml_files_in_dir(&project_path)?
         .into_iter()
         .map(|proj_file| -> Result<_> {
-            let proj_contents = fs::read_to_string(&proj_file)?;
+            let proj_contents = fs::read_to_string(proj_file)?;
             let project: Project = toml::from_str(&proj_contents)?;
             Ok((project.id.clone(), project))
         })
@@ -29,7 +29,7 @@ pub(crate) fn collect_in_repo_db() -> Result<InRepoDB> {
     let tickets: HashMap<_, _> = toml_utils::get_toml_files_in_dir(&ticket_path)?
         .into_iter()
         .map(|ticket_file| -> Result<_> {
-            let ticket_contents = fs::read_to_string(&ticket_file)?;
+            let ticket_contents = fs::read_to_string(ticket_file)?;
             let ticket: Ticket = toml::from_str(&ticket_contents)?;
             Ok((ticket.id.clone(), ticket))
         })
