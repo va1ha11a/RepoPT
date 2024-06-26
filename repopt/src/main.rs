@@ -30,34 +30,13 @@ fn main() -> Result<()> {
 
     match base_command {
         BaseCommands::Init => init_new_repository(),
-        BaseCommands::Add => add_ticket(),
+        BaseCommands::Add => unimplemented!(),
         BaseCommands::List => list_all_tickets(),
         BaseCommands::Show { id } => show_ticket(id),
         BaseCommands::Edit => unimplemented!(),
         BaseCommands::Close => unimplemented!(),
         BaseCommands::Reopen => unimplemented!(),
     }?;
-
-    // Deserialize the data
-    //let in_repo_db = in_repo_db::collect_in_repo_db()?;
-
-    // Use the deserialized data (example)
-
-    // println!("Project one Open Tickets:");
-    // let tiks: Vec<_> = in_repo_db
-    //     .iter_tickets()
-    //     .filter(|t| t.get_project_id() == "P0001")
-    //     .filter(|t| t.is_open())
-    //     .collect();
-    // println!("{:#?}", tiks);
-
-    // println!("Project two Closed Tickets:");
-    // let tiks: Vec<_> = in_repo_db
-    //     .iter_tickets()
-    //     .filter(|t| t.get_project_id() == "P0002")
-    //     .filter(|t| !t.is_open())
-    //     .collect();
-    // println!("{:#?}", tiks);
 
     Ok(())
 }
@@ -90,9 +69,4 @@ fn init_new_repository() -> Result<()> {
         return Err(From::from("Repository already exists."));
     }
     Ok(())
-}
-
-fn add_ticket() -> Result<()> {
-    // let in_repo_db = in_repo_db::collect_in_repo_db();
-    unimplemented!()
 }
