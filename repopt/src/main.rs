@@ -29,10 +29,10 @@ fn main() -> Result<()> {
     let base_command = BaseCommands::parse();
 
     match base_command {
-        BaseCommands::Init => init_new_repository(),
+        BaseCommands::Init => actions::init_new_repository(),
         BaseCommands::Add => unimplemented!(),
-        BaseCommands::List => list_all_tickets(),
-        BaseCommands::Show { id } => show_ticket(id),
+        BaseCommands::List => actions::list_all_tickets(),
+        BaseCommands::Show { id } => actions::show_ticket(id),
         BaseCommands::Edit => unimplemented!(),
         BaseCommands::Close => unimplemented!(),
         BaseCommands::Reopen => unimplemented!(),
@@ -41,32 +41,4 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn list_all_tickets() -> Result<()> {
-    println!("Listing all tickets");
-    let in_repo_db = in_repo_db::collect_in_repo_db();
-    Ok(in_repo_db?
-        .iter_tickets()
-        .for_each(|t| println!("{:#?}", t)))
-}
-
-fn show_ticket(id: String) -> Result<()> {
-    println!("Showing a ticket with id: {id}");
-    let in_repo_db = in_repo_db::collect_in_repo_db();
-    let in_repo_db = in_repo_db?;
-    let ticket = in_repo_db.get_ticket(&id);
-    Ok(if let Some(ticket) = ticket {
-        println!("{:#?}", ticket);
-    } else {
-        return Err(From::from("Ticket not found."));
-    })
-}
-
-fn init_new_repository() -> Result<()> {
-    println!("Initializing a new repository");
-    let in_repo_db = in_repo_db::collect_in_repo_db();
-    // in_repo_db should be an error here
-    if in_repo_db.is_ok() {
-        return Err(From::from("Repository already exists."));
-    }
-    Ok(())
-}
+mod actions;
