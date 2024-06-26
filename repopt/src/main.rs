@@ -31,7 +31,7 @@ fn main() -> Result<()> {
     match base_command {
         BaseCommands::Init => actions::init_new_repository(),
         BaseCommands::Add => unimplemented!(),
-        BaseCommands::List => actions::list_all_tickets(),
+        BaseCommands::List => actions::list_all_tickets(None, None),
         BaseCommands::Show { id } => actions::show_ticket(id),
         BaseCommands::Edit => unimplemented!(),
         BaseCommands::Close => unimplemented!(),

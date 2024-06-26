@@ -97,12 +97,12 @@ pub(super) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
 where
     Self: 'a,
 {
-    fn with_status(self, status: &'a TicketStatus) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
-        Box::new(self.filter(move |ticket| ticket.status == *status))
+    fn with_status(self, status: TicketStatus) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.status == status))
     }
 
-    fn with_type(self, ticket_type: &'a TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
-        Box::new(self.filter(move |ticket| ticket.ticket_type == *ticket_type))
+    fn with_type(self, ticket_type: TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.ticket_type == ticket_type))
     }
 }
 
