@@ -12,11 +12,11 @@ pub(super) fn list_all_tickets(
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let binding = in_repo_db?;
     let mut iter = Box::new(binding.iter_tickets()) as Box<dyn Iterator<Item = &Ticket>>;
-    if filter_on_status.is_some() {
-        iter = iter.with_status(filter_on_status.unwrap());
+    if let Some(status) = filter_on_status {
+        iter = iter.with_status(status);
     }
-    if filter_on_type.is_some() {
-        iter = iter.with_type(TicketType::Bug);
+    if let Some(ticket_type) = filter_on_type {
+        iter = iter.with_type(ticket_type);
     }
     Ok(iter.for_each(|t| println!("{:#?}", t)))
 }
