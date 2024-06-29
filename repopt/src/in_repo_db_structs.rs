@@ -1,3 +1,4 @@
+use clap::ValueEnum;
 use derive_more::Display;
 use serde::Deserialize;
 use serde_json::Value;
@@ -20,7 +21,7 @@ pub(crate) struct ProjectStub {
     pub(crate) id: String,
 }
 
-#[derive(Display, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Display, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketStatus {
     #[display(fmt = "Open")]
     Open,
@@ -30,7 +31,7 @@ pub(crate) enum TicketStatus {
     Closed,
 }
 
-#[derive(Display, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Display, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketType {
     #[display(fmt = "Bug")]
     Bug,

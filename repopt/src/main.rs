@@ -14,7 +14,7 @@ enum BaseCommands {
     #[clap(name = "add", about = "Add a new ticket")]
     Add,
     #[clap(name = "list", about = "List all tickets")]
-    List,
+    List(ListOptions),
     #[clap(name = "show", about = "Show a ticket")]
     Show { id: String },
     #[clap(name = "edit", about = "Edit a ticket")]
@@ -25,13 +25,25 @@ enum BaseCommands {
     Reopen,
 }
 
+use in_repo_db_structs::{TicketStatus, TicketType};
+
+#[derive(Parser, Debug)]
+struct ListOptions {
+    #[clap(long, value_enum)]
+    status: Option<TicketStatus>,
+    #[clap(long, value_enum)]
+    ticket_type: Option<TicketType>,
+}
+
 fn main() -> Result<()> {
     let base_command = BaseCommands::parse();
 
     match base_command {
         BaseCommands::Init => actions::init_new_repository(),
         BaseCommands::Add => unimplemented!(),
-        BaseCommands::List => actions::list_all_tickets(None, None),
+        BaseCommands::List(options) => {
+            actions::list_all_tickets(options.status, options.ticket_type)
+        }
         BaseCommands::Show { id } => actions::show_ticket(id),
         BaseCommands::Edit => unimplemented!(),
         BaseCommands::Close => unimplemented!(),
