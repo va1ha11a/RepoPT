@@ -17,15 +17,14 @@ pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
     let project_path = PathBuf::from(BASE_DIR).join(PROJECTS_DIR);
     let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
 
-    let projects: HashMap<String, Project> = toml_utils::get_toml_files_in_dir(&project_path)?
-        .into_iter()
-        .map(|proj_file| -> Result<_> {
-            let proj_contents = fs::read_to_string(proj_file)?;
-            let project: Project = toml::from_str(&proj_contents)?;
-            Ok((project.id.clone(), project))
-        })
-        .collect::<Result<_>>()?;
+    let projects = collect_projects(project_path)?;
 
+    let tickets = collect_tickets(ticket_path)?;
+
+    Ok(InRepoDB::new(projects, tickets))
+}
+
+fn collect_tickets(ticket_path: PathBuf) -> Result<HashMap<String, Ticket>> {
     let tickets: HashMap<_, _> = toml_utils::get_toml_files_in_dir(&ticket_path)?
         .into_iter()
         .map(|ticket_file| -> Result<_> {
@@ -34,6 +33,17 @@ pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
             Ok((ticket.id.clone(), ticket))
         })
         .collect::<Result<_>>()?;
+    Ok(tickets)
+}
 
-    Ok(InRepoDB::new(projects, tickets))
+fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
+    let projects: HashMap<String, Project> = toml_utils::get_toml_files_in_dir(&project_path)?
+        .into_iter()
+        .map(|proj_file| -> Result<_> {
+            let proj_contents = fs::read_to_string(proj_file)?;
+            let project: Project = toml::from_str(&proj_contents)?;
+            Ok((project.id.clone(), project))
+        })
+        .collect::<Result<_>>()?;
+    Ok(projects)
 }
