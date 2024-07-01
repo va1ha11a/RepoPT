@@ -25,7 +25,7 @@ pub(super) fn show_ticket(id: String) -> Result<()> {
     println!("Showing a ticket with id: {id}");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
-    let ticket = in_repo_db.get_ticket(&id);
+    let ticket = in_repo_db.get_ticket(id.try_into()?);
     if let Some(ticket) = ticket {
         println!("{:#?}", ticket);
     } else {

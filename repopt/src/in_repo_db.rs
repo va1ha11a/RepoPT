@@ -1,4 +1,4 @@
-use crate::in_repo_db_structs::{InRepoDB, Project, Ticket};
+use crate::in_repo_db_structs::{InRepoDB, Project, Ticket, TicketId};
 use crate::toml_utils;
 
 use std::collections::HashMap;
@@ -24,7 +24,7 @@ pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
     Ok(InRepoDB::new(projects, tickets))
 }
 
-fn collect_tickets(ticket_path: PathBuf) -> Result<HashMap<String, Ticket>> {
+fn collect_tickets(ticket_path: PathBuf) -> Result<HashMap<TicketId, Ticket>> {
     let tickets: HashMap<_, _> = toml_utils::get_toml_files_in_dir(&ticket_path)?
         .into_iter()
         .map(|ticket_file| -> Result<_> {

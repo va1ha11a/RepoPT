@@ -1,8 +1,13 @@
 use clap::ValueEnum;
 use derive_more::Display;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+
+use typed_builder::TypedBuilder;
+
+type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
+type Result<T> = std::result::Result<T, Error>;
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
@@ -43,10 +48,35 @@ pub(crate) enum TicketType {
     Other,
 }
 
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash)]
+pub(super) struct TicketId(String);
+
+// Implement TryFrom<String> for TicketId
+impl TryFrom<String> for TicketId {
+    type Error = Error;
+    fn try_from(value: String) -> Result<Self> {
+        match value.parse() {
+            Ok(id) => Ok(TicketId(id)),
+            Err(_) => Err(Error::from("Invalid Ticket ID Format")),
+        }
+    }
+}
+
+impl TryFrom<&str> for TicketId {
+    type Error = Error;
+    fn try_from(value: &str) -> Result<Self> {
+        match value.parse() {
+            Ok(id) => Ok(TicketId(id)),
+            Err(_) => Err(Error::from("Invalid Ticket ID Format")),
+        }
+    }
+}
+
+#[derive(TypedBuilder)]
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 pub(crate) struct Ticket {
-    pub(crate) id: String,
+    pub(crate) id: TicketId,
     title: String,
     status: TicketStatus,
     #[serde(rename = "type")]
@@ -72,12 +102,12 @@ impl Ticket {
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
     projects: HashMap<String, Project>,
-    tickets: HashMap<String, Ticket>,
+    tickets: HashMap<TicketId, Ticket>,
 }
 
 #[allow(dead_code)]
 impl InRepoDB {
-    pub fn new(projects: HashMap<String, Project>, tickets: HashMap<String, Ticket>) -> Self {
+    pub fn new(projects: HashMap<String, Project>, tickets: HashMap<TicketId, Ticket>) -> Self {
         InRepoDB { projects, tickets }
     }
 
@@ -85,8 +115,8 @@ impl InRepoDB {
         self.projects.get(id)
     }
 
-    pub fn get_ticket(&self, id: &str) -> Option<&Ticket> {
-        self.tickets.get(id)
+    pub fn get_ticket(&self, id: TicketId) -> Option<&Ticket> {
+        self.tickets.get(&id)
     }
 
     pub fn iter_tickets(&self) -> impl Iterator<Item = &Ticket> {
