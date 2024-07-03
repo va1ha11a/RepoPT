@@ -4,6 +4,8 @@ mod in_repo_db;
 mod in_repo_db_structs;
 mod toml_utils;
 
+use in_repo_db_structs::{TicketStatus, TicketType};
+
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
@@ -12,7 +14,7 @@ enum BaseCommands {
     #[clap(name = "init", about = "Initialize a new repository")]
     Init,
     #[clap(name = "add", about = "Add a new ticket")]
-    Add,
+    Add(AddOptions),
     #[clap(name = "list", about = "List all tickets")]
     List(ListOptions),
     #[clap(name = "show", about = "Show a ticket")]
@@ -25,7 +27,15 @@ enum BaseCommands {
     Reopen,
 }
 
-use in_repo_db_structs::{TicketStatus, TicketType};
+#[derive(Parser, Debug)]
+struct AddOptions {
+    #[clap(long, value_enum)]
+    title: Option<String>,
+    #[clap(long, value_enum)]
+    status: Option<TicketStatus>,
+    #[clap(long, value_enum)]
+    ticket_type: Option<TicketType>,
+}
 
 #[derive(Parser, Debug)]
 struct ListOptions {
@@ -40,7 +50,9 @@ fn main() -> Result<()> {
 
     match base_command {
         BaseCommands::Init => actions::init_new_repository(),
-        BaseCommands::Add => unimplemented!(),
+        BaseCommands::Add(options) => {
+            actions::add_new_ticket(options.title, options.status, options.ticket_type)
+        }
         BaseCommands::List(options) => {
             actions::list_all_tickets(options.status, options.ticket_type)
         }

@@ -98,7 +98,6 @@ impl Ticket {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
     projects: HashMap<String, Project>,
