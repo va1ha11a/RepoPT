@@ -76,13 +76,13 @@ mod get_user_input {
     type Result<T> = std::result::Result<T, Error>;
 
     pub(super) fn get_title() -> Result<String> {
-        let title = Text::new("Ticket Title:").prompt()?;
+        let title = Text::new("Enter Ticket Title:").prompt()?;
         Ok(title)
     }
 
     pub(super) fn get_ticket_type() -> Result<TicketType> {
         let options = vec!["Bug", "Feature"];
-        let ans = Select::new("What's your favorite fruit?", options).prompt();
+        let ans = Select::new("Select Ticket Type:", options).prompt();
         match ans {
             Ok("Bug") => Ok(TicketType::Bug),
             Ok("Feature") => Ok(TicketType::Feature),
@@ -92,7 +92,7 @@ mod get_user_input {
 
     pub(super) fn get_ticket_status() -> Result<TicketStatus> {
         let options = vec!["Open", "In Progress", "Closed"];
-        let ans = Select::new("What's your favorite fruit?", options).prompt();
+        let ans = Select::new("Select Ticket Status:", options).prompt();
         match ans {
             Ok("Open") => Ok(TicketStatus::Open),
             Ok("In Progress") => Ok(TicketStatus::InProgress),
