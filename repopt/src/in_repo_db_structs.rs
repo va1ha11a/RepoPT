@@ -10,10 +10,10 @@ type Error = Box<dyn std::error::Error>; // replace this with set error types fo
 type Result<T> = std::result::Result<T, Error>;
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub(crate) struct Project {
     pub(crate) id: String,
-    name: String,
+    pub(crate) name: String,
     description: String,
     // Other fields...
     #[serde(flatten)]
@@ -112,6 +112,10 @@ impl InRepoDB {
 
     pub fn get_project(&self, id: &str) -> Option<&Project> {
         self.projects.get(id)
+    }
+
+    pub fn iter_projects(&self) -> impl Iterator<Item = &Project> {
+        self.projects.values()
     }
 
     pub fn get_ticket(&self, id: TicketId) -> Option<&Ticket> {

@@ -54,10 +54,10 @@ pub(super) fn add_new_ticket(
 ) -> Result<()> {
     let ticket = Ticket::builder()
         .id(Ulid::new().to_string().try_into()?)
+        .project(get_user_input::get_project_id().unwrap())
         .title(title.unwrap_or_else(|| get_user_input::get_title().unwrap()))
         .status(status.unwrap_or_else(|| get_user_input::get_ticket_status().unwrap()))
         .ticket_type(ticket_type.unwrap_or_else(|| get_user_input::get_ticket_type().unwrap()))
-        .project(get_user_input::get_project_id().unwrap())
         .extra(HashMap::new())
         .build();
     println!("{:#?}", ticket);
@@ -67,7 +67,10 @@ pub(super) fn add_new_ticket(
 mod get_user_input {
     use inquire::{Select, Text};
 
-    use crate::in_repo_db_structs::{ProjectStub, TicketStatus, TicketType};
+    use crate::{
+        in_repo_db,
+        in_repo_db_structs::{Project, ProjectStub, TicketStatus, TicketType},
+    };
 
     type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
     type Result<T> = std::result::Result<T, Error>;
@@ -99,6 +102,27 @@ mod get_user_input {
     }
 
     pub(super) fn get_project_id() -> Result<ProjectStub> {
-        unimplemented!("Get list of projects and populate stub")
+        let projects = get_projects()?;
+        let options: Vec<String> = projects
+            .iter()
+            .map(|project| project.name.clone())
+            .collect();
+        let ans = Select::new("Select a project:", options).prompt()?;
+        let selected_project = projects
+            .into_iter()
+            .find(|project| project.name == ans)
+            .ok_or("Invalid Project")?;
+        Ok(project_to_projectstub(selected_project))
+    }
+
+    fn get_projects() -> Result<Vec<Project>> {
+        let in_repo_db = in_repo_db::collect_in_repo_db();
+        let in_repo_db = in_repo_db?;
+        let projects = in_repo_db.iter_projects().cloned().collect();
+        Ok(projects)
+    }
+
+    fn project_to_projectstub(project: Project) -> ProjectStub {
+        ProjectStub { id: project.id }
     }
 }
