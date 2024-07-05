@@ -1,5 +1,7 @@
-use crate::in_repo_db_structs::{IRDBWritableObject, InRepoDB, Project, Ticket, TicketId};
+use crate::in_repo_db_structs::{InRepoDB, Project, Ticket, TicketId};
 use crate::toml_utils;
+
+use serde::Serialize;
 
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -49,17 +51,21 @@ fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
     Ok(projects)
 }
 
-pub(crate) trait PathSelectable {
+pub(crate) trait IRDBWritableObject: Serialize {
+    fn fmt_stub(&self) -> String;
     fn select_path(&self) -> PathBuf;
 }
 
-impl PathSelectable for Ticket {
+impl IRDBWritableObject for Ticket {
+    fn fmt_stub(&self) -> String {
+        format!("{}", self.id)
+    }
     fn select_path(&self) -> PathBuf {
         PathBuf::from(BASE_DIR).join(TICKETS_DIR)
     }
 }
 
-pub(crate) fn verify_and_write<T: IRDBWritableObject + PathSelectable>(item: T) -> Result<()> {
+pub(crate) fn verify_and_write<T: IRDBWritableObject>(item: T) -> Result<()> {
     let toml_string = toml::to_string(&item)?;
     let file_name = format!("{}.toml", &item.fmt_stub());
     let save_path = &item.select_path();

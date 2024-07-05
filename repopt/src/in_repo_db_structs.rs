@@ -96,16 +96,6 @@ impl fmt::Display for Ticket {
     }
 }
 
-pub(crate) trait IRDBWritableObject: Serialize {
-    fn fmt_stub(&self) -> String;
-}
-
-impl IRDBWritableObject for Ticket {
-    fn fmt_stub(&self) -> String {
-        format!("{}", self.id)
-    }
-}
-
 #[allow(dead_code)]
 impl Ticket {
     pub(crate) fn is_open(&self) -> bool {
