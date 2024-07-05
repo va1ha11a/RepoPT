@@ -32,7 +32,7 @@ impl fmt::Display for Project {
 }
 
 #[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Display)]
+#[derive(Serialize, Deserialize, Debug, Display, Clone)]
 pub(crate) struct ProjectStub {
     pub(crate) id: String,
 }
@@ -85,10 +85,10 @@ impl TryFrom<&str> for TicketId {
 
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Ticket {
     pub(crate) id: TicketId,
-    title: String,
+    pub(crate) title: String,
     status: TicketStatus,
     #[serde(rename = "type")]
     ticket_type: TicketType,
@@ -115,6 +115,10 @@ impl Ticket {
 
     pub(crate) fn get_project_id(&self) -> &str {
         &self.project.id
+    }
+
+    pub(crate) fn close(&mut self) {
+        self.status = TicketStatus::Closed;
     }
 }
 

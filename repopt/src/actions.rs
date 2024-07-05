@@ -79,12 +79,23 @@ pub(super) fn add_new_project(name: Option<String>, description: Option<String>)
     Ok(())
 }
 
+pub(super) fn close_ticket() -> Result<()> {
+    println!("Closing a ticket");
+    let mut ticket = get_user_input::select_open_ticket()?;
+    ticket.close();
+
+    in_repo_db::verify_and_write(ticket)?;
+    Ok(())
+}
+
 mod get_user_input {
     use inquire::{Select, Text};
 
     use crate::{
         in_repo_db,
-        in_repo_db_structs::{Project, ProjectStub, TicketStatus, TicketType},
+        in_repo_db_structs::{
+            Project, ProjectStub, Ticket, TicketFilters, TicketStatus, TicketType,
+        },
     };
 
     type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
@@ -145,6 +156,28 @@ mod get_user_input {
         let in_repo_db = in_repo_db?;
         let projects = in_repo_db.iter_projects().cloned().collect();
         Ok(projects)
+    }
+
+    pub(super) fn select_open_ticket() -> Result<Ticket> {
+        let tickets = get_open_tickets()?;
+        let options: Vec<String> = tickets.iter().map(|ticket| ticket.title.clone()).collect();
+        let ans = Select::new("Select a ticket:", options).prompt()?;
+        let selected_ticket = tickets
+            .into_iter()
+            .find(|ticket| ticket.title == ans)
+            .ok_or("Invalid Ticket")?;
+        Ok(selected_ticket)
+    }
+
+    fn get_open_tickets() -> Result<Vec<Ticket>> {
+        let in_repo_db = in_repo_db::collect_in_repo_db();
+        let in_repo_db = in_repo_db?;
+        let tickets = in_repo_db
+            .iter_tickets()
+            .with_status(TicketStatus::Open)
+            .cloned()
+            .collect();
+        Ok(tickets)
     }
 
     fn project_to_projectstub(project: Project) -> ProjectStub {
