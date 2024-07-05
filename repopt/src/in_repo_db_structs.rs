@@ -96,11 +96,11 @@ impl fmt::Display for Ticket {
     }
 }
 
-pub(crate) trait InRepoWritableObject: Serialize {
+pub(crate) trait IRDBWritableObject: Serialize {
     fn fmt_stub(&self) -> String;
 }
 
-impl InRepoWritableObject for Ticket {
+impl IRDBWritableObject for Ticket {
     fn fmt_stub(&self) -> String {
         format!("{}", self.id)
     }

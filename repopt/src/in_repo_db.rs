@@ -1,4 +1,4 @@
-use crate::in_repo_db_structs::{InRepoDB, InRepoWritableObject, Project, Ticket, TicketId};
+use crate::in_repo_db_structs::{IRDBWritableObject, InRepoDB, Project, Ticket, TicketId};
 use crate::toml_utils;
 
 use std::collections::HashMap;
@@ -49,10 +49,20 @@ fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
     Ok(projects)
 }
 
-pub(crate) fn verify_and_write<T: InRepoWritableObject>(item: T) -> Result<()> {
+pub(crate) trait PathSelectable {
+    fn select_path(&self) -> PathBuf;
+}
+
+impl PathSelectable for Ticket {
+    fn select_path(&self) -> PathBuf {
+        PathBuf::from(BASE_DIR).join(TICKETS_DIR)
+    }
+}
+
+pub(crate) fn verify_and_write<T: IRDBWritableObject + PathSelectable>(item: T) -> Result<()> {
     let toml_string = toml::to_string(&item)?;
     let file_name = format!("{}.toml", &item.fmt_stub());
-    let save_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
+    let save_path = &item.select_path();
 
     let mut file = File::create(save_path.join(file_name))?;
     file.write_all(toml_string.as_bytes())?;
