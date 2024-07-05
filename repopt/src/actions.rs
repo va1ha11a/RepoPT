@@ -168,12 +168,12 @@ mod get_user_input {
     }
 
     pub(super) fn select_open_ticket() -> Result<Ticket> {
-        let tickets = get_open_tickets()?;
+        let tickets = list_ticket_by_status(TicketStatus::Open)?;
         select_tickets(tickets)
     }
 
     pub(super) fn select_closed_ticket() -> Result<Ticket> {
-        let tickets = get_closed_tickets()?;
+        let tickets = list_ticket_by_status(TicketStatus::Closed)?;
         select_tickets(tickets)
     }
 
@@ -187,23 +187,12 @@ mod get_user_input {
         Ok(selected_ticket)
     }
 
-    fn get_open_tickets() -> Result<Vec<Ticket>> {
+    fn list_ticket_by_status(list_status: TicketStatus) -> Result<Vec<Ticket>> {
         let in_repo_db = in_repo_db::collect_in_repo_db();
         let in_repo_db = in_repo_db?;
         let tickets = in_repo_db
             .iter_tickets()
-            .with_status(TicketStatus::Open)
-            .cloned()
-            .collect();
-        Ok(tickets)
-    }
-
-    fn get_closed_tickets() -> Result<Vec<Ticket>> {
-        let in_repo_db = in_repo_db::collect_in_repo_db();
-        let in_repo_db = in_repo_db?;
-        let tickets = in_repo_db
-            .iter_tickets()
-            .with_status(TicketStatus::Closed)
+            .with_status(list_status)
             .cloned()
             .collect();
         Ok(tickets)
