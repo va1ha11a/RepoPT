@@ -120,7 +120,7 @@ mod get_user_input {
 
     use super::{get_projects, list_ticket_by_status};
 
-    use crate::in_repo_db_structs::{Project, ProjectStub, Ticket, TicketStatus, TicketType};
+    use crate::in_repo_db_structs::{ProjectStub, Ticket, TicketStatus, TicketType};
 
     type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
     type Result<T> = std::result::Result<T, Error>;
@@ -172,7 +172,7 @@ mod get_user_input {
             .into_iter()
             .find(|project| project.name == ans)
             .ok_or("Invalid Project")?;
-        Ok(project_to_projectstub(selected_project))
+        Ok(selected_project.into())
     }
 
     pub(super) fn select_open_ticket() -> Result<Ticket> {
@@ -193,9 +193,5 @@ mod get_user_input {
             .find(|ticket| ticket.title == ans)
             .ok_or("Invalid Ticket")?;
         Ok(selected_ticket)
-    }
-
-    fn project_to_projectstub(project: Project) -> ProjectStub {
-        ProjectStub { id: project.id }
     }
 }

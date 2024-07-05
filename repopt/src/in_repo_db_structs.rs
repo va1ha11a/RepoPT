@@ -21,6 +21,12 @@ pub(crate) struct Project {
     extra: HashMap<String, Value>,
 }
 
+impl From<Project> for ProjectStub {
+    fn from(project: Project) -> Self {
+        ProjectStub { id: project.id }
+    }
+}
+
 impl fmt::Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
