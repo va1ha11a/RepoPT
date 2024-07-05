@@ -6,9 +6,6 @@ use std::{collections::HashMap, fmt};
 
 use typed_builder::TypedBuilder;
 
-type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
-type Result<T> = std::result::Result<T, Error>;
-
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -68,24 +65,9 @@ pub(crate) enum TicketType {
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display)]
 pub(crate) struct TicketId(String);
 
-// Implement TryFrom<String> for TicketId
-impl TryFrom<String> for TicketId {
-    type Error = Error;
-    fn try_from(value: String) -> Result<Self> {
-        match value.parse() {
-            Ok(id) => Ok(TicketId(id)),
-            Err(_) => Err(Error::from("Invalid Ticket ID Format")),
-        }
-    }
-}
-
-impl TryFrom<&str> for TicketId {
-    type Error = Error;
-    fn try_from(value: &str) -> Result<Self> {
-        match value.parse() {
-            Ok(id) => Ok(TicketId(id)),
-            Err(_) => Err(Error::from("Invalid Ticket ID Format")),
-        }
+impl From<String> for TicketId {
+    fn from(s: String) -> Self {
+        TicketId(s)
     }
 }
 

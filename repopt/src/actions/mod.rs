@@ -30,7 +30,7 @@ pub(super) fn show_ticket(id: String) -> Result<()> {
     println!("Showing a ticket with id: {id}");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
-    let ticket = in_repo_db.get_ticket(id.try_into()?);
+    let ticket = in_repo_db.get_ticket(id.into());
     if let Some(ticket) = ticket {
         println!("{:#?}", ticket);
     } else {
@@ -55,7 +55,7 @@ pub(super) fn add_new_ticket(
     ticket_type: Option<TicketType>,
 ) -> Result<()> {
     let ticket = Ticket::builder()
-        .id(Ulid::new().to_string().try_into()?)
+        .id(Ulid::new().to_string().into())
         .project(get_user_input::get_project_id().unwrap())
         .title(title.unwrap_or_else(|| get_user_input::get_title().unwrap()))
         .status(status.unwrap_or_else(|| get_user_input::get_ticket_status().unwrap()))
