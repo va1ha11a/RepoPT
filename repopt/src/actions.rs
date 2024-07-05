@@ -97,15 +97,30 @@ pub(super) fn reopen_ticket() -> Result<()> {
     Ok(())
 }
 
+pub(super) fn list_ticket_by_status(list_status: TicketStatus) -> Result<Vec<Ticket>> {
+    let in_repo_db = in_repo_db::collect_in_repo_db();
+    let in_repo_db = in_repo_db?;
+    let tickets = in_repo_db
+        .iter_tickets()
+        .with_status(list_status)
+        .cloned()
+        .collect();
+    Ok(tickets)
+}
+
+pub(super) fn get_projects() -> Result<Vec<Project>> {
+    let in_repo_db = in_repo_db::collect_in_repo_db();
+    let in_repo_db = in_repo_db?;
+    let projects = in_repo_db.iter_projects().cloned().collect();
+    Ok(projects)
+}
+
 mod get_user_input {
     use inquire::{Select, Text};
 
-    use crate::{
-        in_repo_db,
-        in_repo_db_structs::{
-            Project, ProjectStub, Ticket, TicketFilters, TicketStatus, TicketType,
-        },
-    };
+    use super::{get_projects, list_ticket_by_status};
+
+    use crate::in_repo_db_structs::{Project, ProjectStub, Ticket, TicketStatus, TicketType};
 
     type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
     type Result<T> = std::result::Result<T, Error>;
@@ -160,13 +175,6 @@ mod get_user_input {
         Ok(project_to_projectstub(selected_project))
     }
 
-    fn get_projects() -> Result<Vec<Project>> {
-        let in_repo_db = in_repo_db::collect_in_repo_db();
-        let in_repo_db = in_repo_db?;
-        let projects = in_repo_db.iter_projects().cloned().collect();
-        Ok(projects)
-    }
-
     pub(super) fn select_open_ticket() -> Result<Ticket> {
         let tickets = list_ticket_by_status(TicketStatus::Open)?;
         select_tickets(tickets)
@@ -185,17 +193,6 @@ mod get_user_input {
             .find(|ticket| ticket.title == ans)
             .ok_or("Invalid Ticket")?;
         Ok(selected_ticket)
-    }
-
-    fn list_ticket_by_status(list_status: TicketStatus) -> Result<Vec<Ticket>> {
-        let in_repo_db = in_repo_db::collect_in_repo_db();
-        let in_repo_db = in_repo_db?;
-        let tickets = in_repo_db
-            .iter_tickets()
-            .with_status(list_status)
-            .cloned()
-            .collect();
-        Ok(tickets)
     }
 
     fn project_to_projectstub(project: Project) -> ProjectStub {
