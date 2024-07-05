@@ -1,7 +1,7 @@
 pub mod structs;
 mod toml_utils;
 
-use structs::{InRepoDB, Project, Ticket, TicketId};
+use structs::{InRepoDB, Project, ProjectId, Ticket, TicketId};
 
 use serde::Serialize;
 
@@ -41,8 +41,8 @@ fn collect_tickets(ticket_path: PathBuf) -> Result<HashMap<TicketId, Ticket>> {
     Ok(tickets)
 }
 
-fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
-    let projects: HashMap<String, Project> = toml_utils::get_toml_files_in_dir(&project_path)?
+fn collect_projects(project_path: PathBuf) -> Result<HashMap<ProjectId, Project>> {
+    let projects: HashMap<ProjectId, Project> = toml_utils::get_toml_files_in_dir(&project_path)?
         .into_iter()
         .map(|proj_file| -> Result<_> {
             let proj_contents = fs::read_to_string(proj_file)?;

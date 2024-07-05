@@ -1,5 +1,5 @@
 use clap::ValueEnum;
-use derive_more::Display;
+use derive_more::{Display, From};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::{collections::HashMap, fmt};
@@ -10,7 +10,7 @@ use typed_builder::TypedBuilder;
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Project {
-    pub(crate) id: String,
+    pub(crate) id: ProjectId,
     pub(crate) name: String,
     description: String,
     // Other fields...
@@ -37,7 +37,7 @@ impl fmt::Display for Project {
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Display, Clone)]
 pub(crate) struct ProjectStub {
-    pub(crate) id: String,
+    pub(crate) id: ProjectId,
 }
 
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
@@ -62,14 +62,11 @@ pub(crate) enum TicketType {
     Other,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From)]
 pub(crate) struct TicketId(String);
 
-impl From<String> for TicketId {
-    fn from(s: String) -> Self {
-        TicketId(s)
-    }
-}
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From)]
+pub(crate) struct ProjectId(String);
 
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
@@ -101,7 +98,7 @@ impl Ticket {
         self.status == TicketStatus::Open
     }
 
-    pub(crate) fn get_project_id(&self) -> &str {
+    pub(crate) fn get_project_id(&self) -> &ProjectId {
         &self.project.id
     }
 
@@ -116,17 +113,17 @@ impl Ticket {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
-    projects: HashMap<String, Project>,
+    projects: HashMap<ProjectId, Project>,
     tickets: HashMap<TicketId, Ticket>,
 }
 
 #[allow(dead_code)]
 impl InRepoDB {
-    pub fn new(projects: HashMap<String, Project>, tickets: HashMap<TicketId, Ticket>) -> Self {
+    pub fn new(projects: HashMap<ProjectId, Project>, tickets: HashMap<TicketId, Ticket>) -> Self {
         InRepoDB { projects, tickets }
     }
 
-    pub fn get_project(&self, id: &str) -> Option<&Project> {
+    pub fn get_project(&self, id: &ProjectId) -> Option<&Project> {
         self.projects.get(id)
     }
 

@@ -71,7 +71,7 @@ pub(super) fn add_new_ticket(
 pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
     println!("Adding a new project");
     let project = Project::builder()
-        .id(Ulid::new().into())
+        .id(Ulid::new().to_string().into())
         .name(name.unwrap_or_else(|| get_user_input::get_proj_name().unwrap()))
         .description(description.unwrap_or_else(|| get_user_input::get_proj_desc().unwrap()))
         .extra(HashMap::new())
