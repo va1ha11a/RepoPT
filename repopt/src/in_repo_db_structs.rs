@@ -2,7 +2,7 @@ use clap::ValueEnum;
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
 use typed_builder::TypedBuilder;
 
@@ -10,7 +10,7 @@ type Error = Box<dyn std::error::Error>; // replace this with set error types fo
 type Result<T> = std::result::Result<T, Error>;
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Project {
     pub(crate) id: String,
     pub(crate) name: String,
@@ -21,12 +21,12 @@ pub(crate) struct Project {
 }
 
 #[allow(dead_code)]
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Display)]
 pub(crate) struct ProjectStub {
     pub(crate) id: String,
 }
 
-#[derive(Display, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
+#[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketStatus {
     #[display(fmt = "Open")]
     Open,
@@ -36,7 +36,7 @@ pub(crate) enum TicketStatus {
     Closed,
 }
 
-#[derive(Display, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
+#[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketType {
     #[display(fmt = "Bug")]
     Bug,
@@ -48,7 +48,7 @@ pub(crate) enum TicketType {
     Other,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display)]
 pub(super) struct TicketId(String);
 
 // Implement TryFrom<String> for TicketId
@@ -74,7 +74,7 @@ impl TryFrom<&str> for TicketId {
 
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Ticket {
     pub(crate) id: TicketId,
     title: String,
@@ -85,6 +85,25 @@ pub(crate) struct Ticket {
     // Other fields...
     #[serde(flatten)]
     extra: HashMap<String, Value>,
+}
+impl fmt::Display for Ticket {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Ticket ID: {}\nTitle: {}\nStatus: {}\nType: {}\nProject ID: {}",
+            self.id, self.title, self.status, self.ticket_type, self.project.id
+        )
+    }
+}
+
+pub(crate) trait StubDisplay {
+    fn fmt_stub(&self) -> String;
+}
+
+impl StubDisplay for Ticket {
+    fn fmt_stub(&self) -> String {
+        format!("{}", self.id)
+    }
 }
 
 #[allow(dead_code)]

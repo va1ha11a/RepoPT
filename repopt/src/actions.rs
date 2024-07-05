@@ -60,7 +60,9 @@ pub(super) fn add_new_ticket(
         .ticket_type(ticket_type.unwrap_or_else(|| get_user_input::get_ticket_type().unwrap()))
         .extra(HashMap::new())
         .build();
-    println!("{:#?}", ticket);
+    println!("{}", ticket);
+    in_repo_db::verify_and_write(in_repo_db::Writable::Ticket(ticket))?;
+
     Ok(())
 }
 

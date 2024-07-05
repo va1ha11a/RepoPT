@@ -1,13 +1,17 @@
-use crate::in_repo_db_structs::{InRepoDB, Project, Ticket, TicketId};
+use derive_more::Display;
+use serde::Serialize;
+
+use crate::in_repo_db_structs::{InRepoDB, Project, StubDisplay, Ticket, TicketId};
 use crate::toml_utils;
 
 use std::collections::HashMap;
-use std::fs;
+use std::fs::{self, File};
 
 const BASE_DIR: &str = "example_data";
 const PROJECTS_DIR: &str = "projects";
 const TICKETS_DIR: &str = "tickets";
 
+use std::io::Write;
 use std::path::PathBuf;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
@@ -46,4 +50,29 @@ fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
         })
         .collect::<Result<_>>()?;
     Ok(projects)
+}
+
+#[derive(Serialize, Display)]
+pub(crate) enum Writable {
+    Ticket(Ticket),
+}
+impl StubDisplay for Writable {
+    fn fmt_stub(&self) -> String {
+        match self {
+            Writable::Ticket(ticket) => ticket.fmt_stub(),
+            // Add other variants here as needed
+        }
+    }
+}
+
+pub(crate) fn verify_and_write(item: Writable) -> Result<()> {
+    let toml_string = match &item {
+        Writable::Ticket(ticket) => toml::to_string(&ticket)?,
+    };
+    // todo!("sort ut path for different types of items");
+    let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
+    let file_name = format!("{}.toml", &item.fmt_stub());
+    let mut file = File::create(ticket_path.join(file_name))?;
+    file.write_all(toml_string.as_bytes())?;
+    Ok(())
 }
