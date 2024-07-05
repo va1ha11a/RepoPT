@@ -9,6 +9,7 @@ use typed_builder::TypedBuilder;
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
+#[derive(TypedBuilder)]
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Project {
@@ -18,6 +19,16 @@ pub(crate) struct Project {
     // Other fields...
     #[serde(flatten)]
     extra: HashMap<String, Value>,
+}
+
+impl fmt::Display for Project {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Project ID: {}\nName: {}\nDescription: {}",
+            self.id, self.name, self.description
+        )
+    }
 }
 
 #[allow(dead_code)]

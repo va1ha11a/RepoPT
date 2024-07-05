@@ -58,10 +58,19 @@ pub(crate) trait IRDBWritableObject: Serialize {
 
 impl IRDBWritableObject for Ticket {
     fn fmt_stub(&self) -> String {
-        format!("{}", self.id)
+        self.id.to_string()
     }
     fn select_path(&self) -> PathBuf {
         PathBuf::from(BASE_DIR).join(TICKETS_DIR)
+    }
+}
+
+impl IRDBWritableObject for Project {
+    fn fmt_stub(&self) -> String {
+        self.id.to_string()
+    }
+    fn select_path(&self) -> PathBuf {
+        PathBuf::from(BASE_DIR).join(PROJECTS_DIR)
     }
 }
 

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use ulid::Ulid;
 
 use crate::in_repo_db;
-use crate::in_repo_db_structs::{Ticket, TicketFilters, TicketStatus, TicketType};
+use crate::in_repo_db_structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
@@ -66,6 +66,19 @@ pub(super) fn add_new_ticket(
     Ok(())
 }
 
+pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
+    println!("Adding a new project");
+    let project = Project::builder()
+        .id(Ulid::new().into())
+        .name(name.unwrap_or_else(|| get_user_input::get_proj_name().unwrap()))
+        .description(description.unwrap_or_else(|| get_user_input::get_proj_desc().unwrap()))
+        .extra(HashMap::new())
+        .build();
+    println!("{}", project);
+    in_repo_db::verify_and_write(project)?;
+    Ok(())
+}
+
 mod get_user_input {
     use inquire::{Select, Text};
 
@@ -79,6 +92,16 @@ mod get_user_input {
 
     pub(super) fn get_title() -> Result<String> {
         let title = Text::new("Enter Ticket Title:").prompt()?;
+        Ok(title)
+    }
+
+    pub(super) fn get_proj_name() -> Result<String> {
+        let title = Text::new("Enter Project Name:").prompt()?;
+        Ok(title)
+    }
+
+    pub(super) fn get_proj_desc() -> Result<String> {
+        let title = Text::new("Enter Project Description:").prompt()?;
         Ok(title)
     }
 

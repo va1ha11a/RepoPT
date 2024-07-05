@@ -13,7 +13,8 @@ type Result<T> = std::result::Result<T, Error>;
 enum BaseCommands {
     #[clap(name = "init", about = "Initialize a new repository")]
     Init,
-    #[clap(name = "add", about = "Add a new ticket")]
+    #[clap(name = "add", about = "Add a new item")]
+    #[command(subcommand)]
     Add(AddOptions),
     #[clap(name = "list", about = "List all tickets")]
     List(ListOptions),
@@ -28,7 +29,23 @@ enum BaseCommands {
 }
 
 #[derive(Parser, Debug)]
-struct AddOptions {
+enum AddOptions {
+    #[clap(name = "ticket", about = "Add a new ticket")]
+    Ticket(AddTicketOptions),
+    #[clap(name = "project", about = "Add a new project")]
+    Project(AddProjectOptions),
+}
+
+#[derive(Parser, Debug)]
+struct AddProjectOptions {
+    #[clap(long, value_enum)]
+    name: Option<String>,
+    #[clap(long, value_enum)]
+    description: Option<String>,
+}
+
+#[derive(Parser, Debug)]
+struct AddTicketOptions {
     #[clap(long, value_enum)]
     title: Option<String>,
     #[clap(long, value_enum)]
@@ -50,8 +67,13 @@ fn main() -> Result<()> {
 
     match base_command {
         BaseCommands::Init => actions::init_new_repository(),
-        BaseCommands::Add(options) => {
-            actions::add_new_ticket(options.title, options.status, options.ticket_type)
+        BaseCommands::Add(AddOptions::Ticket(ticket_options)) => actions::add_new_ticket(
+            ticket_options.title,
+            ticket_options.status,
+            ticket_options.ticket_type,
+        ),
+        BaseCommands::Add(AddOptions::Project(project_options)) => {
+            actions::add_new_project(project_options.name, project_options.description)
         }
         BaseCommands::List(options) => {
             actions::list_all_tickets(options.status, options.ticket_type)
