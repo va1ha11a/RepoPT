@@ -61,7 +61,7 @@ pub(super) fn add_new_ticket(
         .extra(HashMap::new())
         .build();
     println!("{}", ticket);
-    in_repo_db::verify_and_write(in_repo_db::Writable::Ticket(ticket))?;
+    in_repo_db::verify_and_write(ticket)?;
 
     Ok(())
 }

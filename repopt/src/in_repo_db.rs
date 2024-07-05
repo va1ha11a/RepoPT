@@ -1,7 +1,4 @@
-use derive_more::Display;
-use serde::Serialize;
-
-use crate::in_repo_db_structs::{InRepoDB, Project, StubDisplay, Ticket, TicketId};
+use crate::in_repo_db_structs::{InRepoDB, InRepoWritableObject, Project, Ticket, TicketId};
 use crate::toml_utils;
 
 use std::collections::HashMap;
@@ -52,27 +49,12 @@ fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
     Ok(projects)
 }
 
-#[derive(Serialize, Display)]
-pub(crate) enum Writable {
-    Ticket(Ticket),
-}
+pub(crate) fn verify_and_write<T: InRepoWritableObject>(item: T) -> Result<()> {
+    let toml_string = toml::to_string(&item)?;
+    let file_name = format!("{}.toml", &item.fmt_stub());
+    let save_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
 
-struct TomlFileData {
-    toml_string: String,
-    file_name: String,
-    save_path: PathBuf,
-}
-
-pub(crate) fn verify_and_write(item: Writable) -> Result<()> {
-    let toml_file_data = match &item {
-        Writable::Ticket(ticket) => TomlFileData {
-            toml_string: toml::to_string(&ticket)?,
-            file_name: format!("{}.toml", &ticket.fmt_stub()),
-            save_path: PathBuf::from(BASE_DIR).join(TICKETS_DIR),
-        },
-        // Future cases can be added here
-    };
-    let mut file = File::create(toml_file_data.save_path.join(toml_file_data.file_name))?;
-    file.write_all(toml_file_data.toml_string.as_bytes())?;
+    let mut file = File::create(save_path.join(file_name))?;
+    file.write_all(toml_string.as_bytes())?;
     Ok(())
 }
