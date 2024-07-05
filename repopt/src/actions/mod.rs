@@ -70,6 +70,7 @@ pub(super) fn add_new_ticket(
 
 pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
     println!("Adding a new project");
+    // TODO: figure out how to get rid of the below unwraps
     let project = Project::builder()
         .id(Ulid::new().to_string().into())
         .name(name.unwrap_or_else(|| get_user_input::get_proj_name().unwrap()))
