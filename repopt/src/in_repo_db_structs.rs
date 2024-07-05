@@ -120,6 +120,10 @@ impl Ticket {
     pub(crate) fn close(&mut self) {
         self.status = TicketStatus::Closed;
     }
+
+    pub(crate) fn reopen(&mut self) {
+        self.status = TicketStatus::Open;
+    }
 }
 
 #[derive(Deserialize, Debug)]

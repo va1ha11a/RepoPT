@@ -81,7 +81,7 @@ fn main() -> Result<()> {
         BaseCommands::Show { id } => actions::show_ticket(id),
         BaseCommands::Edit => unimplemented!(),
         BaseCommands::Close => actions::close_ticket(),
-        BaseCommands::Reopen => unimplemented!(),
+        BaseCommands::Reopen => actions::reopen_ticket(),
     }?;
 
     Ok(())

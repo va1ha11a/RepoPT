@@ -88,6 +88,15 @@ pub(super) fn close_ticket() -> Result<()> {
     Ok(())
 }
 
+pub(super) fn reopen_ticket() -> Result<()> {
+    println!("Reopening a ticket");
+    let mut ticket = get_user_input::select_closed_ticket()?;
+    ticket.reopen();
+
+    in_repo_db::verify_and_write(ticket)?;
+    Ok(())
+}
+
 mod get_user_input {
     use inquire::{Select, Text};
 
@@ -160,6 +169,15 @@ mod get_user_input {
 
     pub(super) fn select_open_ticket() -> Result<Ticket> {
         let tickets = get_open_tickets()?;
+        select_tickets(tickets)
+    }
+
+    pub(super) fn select_closed_ticket() -> Result<Ticket> {
+        let tickets = get_closed_tickets()?;
+        select_tickets(tickets)
+    }
+
+    fn select_tickets(tickets: Vec<Ticket>) -> Result<Ticket> {
         let options: Vec<String> = tickets.iter().map(|ticket| ticket.title.clone()).collect();
         let ans = Select::new("Select a ticket:", options).prompt()?;
         let selected_ticket = tickets
@@ -175,6 +193,17 @@ mod get_user_input {
         let tickets = in_repo_db
             .iter_tickets()
             .with_status(TicketStatus::Open)
+            .cloned()
+            .collect();
+        Ok(tickets)
+    }
+
+    fn get_closed_tickets() -> Result<Vec<Ticket>> {
+        let in_repo_db = in_repo_db::collect_in_repo_db();
+        let in_repo_db = in_repo_db?;
+        let tickets = in_repo_db
+            .iter_tickets()
+            .with_status(TicketStatus::Closed)
             .cloned()
             .collect();
         Ok(tickets)
