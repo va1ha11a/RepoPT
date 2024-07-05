@@ -2,7 +2,7 @@ use inquire::{Select, Text};
 
 use super::{get_projects, list_ticket_by_status};
 
-use crate::in_repo_db_structs::{ProjectStub, Ticket, TicketStatus, TicketType};
+use crate::in_repo_db::structs::{ProjectStub, Ticket, TicketStatus, TicketType};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;

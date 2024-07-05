@@ -1,5 +1,7 @@
-use crate::in_repo_db_structs::{InRepoDB, Project, Ticket, TicketId};
-use crate::toml_utils;
+pub mod structs;
+mod toml_utils;
+
+use structs::{InRepoDB, Project, Ticket, TicketId};
 
 use serde::Serialize;
 

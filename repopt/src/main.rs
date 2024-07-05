@@ -1,10 +1,8 @@
 use clap::Parser;
 
 mod in_repo_db;
-mod in_repo_db_structs;
-mod toml_utils;
 
-use in_repo_db_structs::{TicketStatus, TicketType};
+use in_repo_db::structs::{TicketStatus, TicketType};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;

@@ -66,7 +66,7 @@ pub(crate) enum TicketType {
 }
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display)]
-pub(super) struct TicketId(String);
+pub(crate) struct TicketId(String);
 
 // Implement TryFrom<String> for TicketId
 impl TryFrom<String> for TicketId {
@@ -161,7 +161,7 @@ impl InRepoDB {
     }
 }
 
-pub(super) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
+pub(crate) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
 where
     Self: 'a,
 {
