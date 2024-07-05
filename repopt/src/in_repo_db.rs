@@ -56,23 +56,23 @@ fn collect_projects(project_path: PathBuf) -> Result<HashMap<String, Project>> {
 pub(crate) enum Writable {
     Ticket(Ticket),
 }
-impl StubDisplay for Writable {
-    fn fmt_stub(&self) -> String {
-        match self {
-            Writable::Ticket(ticket) => ticket.fmt_stub(),
-            // Add other variants here as needed
-        }
-    }
+
+struct TomlFileData {
+    toml_string: String,
+    file_name: String,
+    save_path: PathBuf,
 }
 
 pub(crate) fn verify_and_write(item: Writable) -> Result<()> {
-    let toml_string = match &item {
-        Writable::Ticket(ticket) => toml::to_string(&ticket)?,
+    let toml_file_data = match &item {
+        Writable::Ticket(ticket) => TomlFileData {
+            toml_string: toml::to_string(&ticket)?,
+            file_name: format!("{}.toml", &ticket.fmt_stub()),
+            save_path: PathBuf::from(BASE_DIR).join(TICKETS_DIR),
+        },
+        // Future cases can be added here
     };
-    // todo!("sort ut path for different types of items");
-    let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
-    let file_name = format!("{}.toml", &item.fmt_stub());
-    let mut file = File::create(ticket_path.join(file_name))?;
-    file.write_all(toml_string.as_bytes())?;
+    let mut file = File::create(toml_file_data.save_path.join(toml_file_data.file_name))?;
+    file.write_all(toml_file_data.toml_string.as_bytes())?;
     Ok(())
 }
