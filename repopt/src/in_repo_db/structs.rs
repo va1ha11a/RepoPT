@@ -11,8 +11,8 @@ use typed_builder::TypedBuilder;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Project {
     pub(crate) id: ProjectId,
-    pub(crate) name: String,
-    description: String,
+    pub(crate) name: String, // TODO: Create NewType
+    description: String,     // TODO: Create NewType
     // Other fields...
     #[serde(flatten)]
     extra: HashMap<String, Value>,
@@ -73,7 +73,7 @@ pub(crate) struct ProjectId(String);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Ticket {
     pub(crate) id: TicketId,
-    pub(crate) title: String,
+    pub(crate) title: String, // TODO: Create NewType
     status: TicketStatus,
     #[serde(rename = "type")]
     ticket_type: TicketType,
