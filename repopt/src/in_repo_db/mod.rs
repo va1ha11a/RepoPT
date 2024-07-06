@@ -13,7 +13,7 @@ const PROJECTS_DIR: &str = "projects";
 const TICKETS_DIR: &str = "tickets";
 
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
@@ -22,15 +22,15 @@ pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
     let project_path = PathBuf::from(BASE_DIR).join(PROJECTS_DIR);
     let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
 
-    let projects = collect_projects(project_path)?;
+    let projects = collect_projects(&project_path)?;
 
-    let tickets = collect_tickets(ticket_path)?;
+    let tickets = collect_tickets(&ticket_path)?;
 
     Ok(InRepoDB::new(projects, tickets))
 }
 
-fn collect_tickets(ticket_path: PathBuf) -> Result<HashMap<TicketId, Ticket>> {
-    let tickets: HashMap<_, _> = toml_utils::get_toml_files_in_dir(&ticket_path)?
+fn collect_tickets(ticket_path: &Path) -> Result<HashMap<TicketId, Ticket>> {
+    let tickets: HashMap<_, _> = toml_utils::get_toml_files_in_dir(ticket_path)?
         .into_iter()
         .map(|ticket_file| -> Result<_> {
             let ticket_contents = fs::read_to_string(ticket_file)?;
@@ -41,8 +41,8 @@ fn collect_tickets(ticket_path: PathBuf) -> Result<HashMap<TicketId, Ticket>> {
     Ok(tickets)
 }
 
-fn collect_projects(project_path: PathBuf) -> Result<HashMap<ProjectId, Project>> {
-    let projects: HashMap<ProjectId, Project> = toml_utils::get_toml_files_in_dir(&project_path)?
+fn collect_projects(project_path: &Path) -> Result<HashMap<ProjectId, Project>> {
+    let projects: HashMap<ProjectId, Project> = toml_utils::get_toml_files_in_dir(project_path)?
         .into_iter()
         .map(|proj_file| -> Result<_> {
             let proj_contents = fs::read_to_string(proj_file)?;
@@ -76,10 +76,10 @@ impl IRDBWritableObject for Project {
     }
 }
 
-pub(crate) fn verify_and_write<T: IRDBWritableObject>(item: T) -> Result<()> {
-    let toml_string = toml::to_string(&item)?;
-    let file_name = format!("{}.toml", &item.fmt_stub());
-    let save_path = &item.select_path();
+pub(crate) fn verify_and_write<T: IRDBWritableObject>(item: &T) -> Result<()> {
+    let toml_string = toml::to_string(item)?;
+    let file_name = format!("{}.toml", item.fmt_stub());
+    let save_path = item.select_path();
 
     let mut file = File::create(save_path.join(file_name))?;
     file.write_all(toml_string.as_bytes())?;

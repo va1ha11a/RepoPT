@@ -131,8 +131,8 @@ impl InRepoDB {
         self.projects.values()
     }
 
-    pub fn get_ticket(&self, id: TicketId) -> Option<&Ticket> {
-        self.tickets.get(&id)
+    pub fn get_ticket(&self, id: &TicketId) -> Option<&Ticket> {
+        self.tickets.get(id)
     }
 
     pub fn iter_tickets(&self) -> impl Iterator<Item = &Ticket> {

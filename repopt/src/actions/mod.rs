@@ -23,16 +23,16 @@ pub(super) fn list_all_tickets(
     if let Some(ticket_type) = filter_on_type {
         iter = iter.with_type(ticket_type);
     }
-    Ok(iter.for_each(|t| println!("{:#?}", t)))
+    Ok(iter.for_each(|t| println!("{t:#?}")))
 }
 
 pub(super) fn show_ticket(id: String) -> Result<()> {
     println!("Showing a ticket with id: {id}");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
-    let ticket = in_repo_db.get_ticket(id.into());
+    let ticket = in_repo_db.get_ticket(&id.into());
     if let Some(ticket) = ticket {
-        println!("{:#?}", ticket);
+        println!("{ticket:#?}");
     } else {
         return Err(From::from("Ticket not found."));
     };
@@ -62,8 +62,8 @@ pub(super) fn add_new_ticket(
         .ticket_type(ticket_type.unwrap_or_else(|| get_user_input::get_ticket_type().unwrap()))
         .extra(HashMap::new())
         .build();
-    println!("{}", ticket);
-    in_repo_db::verify_and_write(ticket)?;
+    println!("{ticket}");
+    in_repo_db::verify_and_write(&ticket)?;
 
     Ok(())
 }
@@ -77,8 +77,8 @@ pub(super) fn add_new_project(name: Option<String>, description: Option<String>)
         .description(description.unwrap_or_else(|| get_user_input::get_proj_desc().unwrap()))
         .extra(HashMap::new())
         .build();
-    println!("{}", project);
-    in_repo_db::verify_and_write(project)?;
+    println!("{project}");
+    in_repo_db::verify_and_write(&project)?;
     Ok(())
 }
 
@@ -87,7 +87,7 @@ pub(super) fn close_ticket() -> Result<()> {
     let mut ticket = get_user_input::select_open_ticket()?;
     ticket.close();
 
-    in_repo_db::verify_and_write(ticket)?;
+    in_repo_db::verify_and_write(&ticket)?;
     Ok(())
 }
 
@@ -96,7 +96,7 @@ pub(super) fn reopen_ticket() -> Result<()> {
     let mut ticket = get_user_input::select_closed_ticket()?;
     ticket.reopen();
 
-    in_repo_db::verify_and_write(ticket)?;
+    in_repo_db::verify_and_write(&ticket)?;
     Ok(())
 }
 
