@@ -3,7 +3,6 @@ mod get_user_input;
 use crate::in_repo_db;
 use crate::in_repo_db::structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
 use std::collections::HashMap;
-use ulid::Ulid;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
@@ -53,6 +52,7 @@ pub(super) fn add_new_ticket(
     status: Option<TicketStatus>,
     ticket_type: Option<TicketType>,
 ) -> Result<()> {
+    let in_repo_db = in_repo_db::collect_in_repo_db()?;
     let project_id = get_user_input::get_project_id()?;
 
     let title = title.map(Ok).unwrap_or_else(get_user_input::get_title)?;
@@ -64,7 +64,9 @@ pub(super) fn add_new_ticket(
         .unwrap_or_else(get_user_input::get_ticket_type)?;
 
     let ticket = Ticket::builder()
-        .id(Ulid::new().to_string().into())
+        .id(in_repo_db
+            .get_next_ticket_id()
+            .unwrap_or("T0001".to_owned().into()))
         .project(project_id)
         .title(title)
         .status(status)
@@ -80,9 +82,12 @@ pub(super) fn add_new_ticket(
 
 pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
     println!("Adding a new project");
+    let in_repo_db = in_repo_db::collect_in_repo_db()?;
     // TODO: figure out how to get rid of the below unwraps
     let project = Project::builder()
-        .id(Ulid::new().to_string().into())
+        .id(in_repo_db
+            .get_next_project_id()
+            .unwrap_or("P0001".to_owned().into()))
         .name(name.unwrap_or_else(|| get_user_input::get_proj_name().unwrap()))
         .description(description.unwrap_or_else(|| get_user_input::get_proj_desc().unwrap()))
         .extra(HashMap::new())
