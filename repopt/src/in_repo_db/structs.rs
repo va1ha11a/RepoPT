@@ -147,6 +147,16 @@ impl InRepoDB {
     pub fn iter_tickets(&self) -> impl Iterator<Item = &Ticket> {
         self.tickets.values()
     }
+
+    pub fn get_next_ticket_id(&self) -> Option<TicketId> {
+        let last_id = self.tickets.last_key_value().map(|(id, _)| id);
+        last_id.map(|id| TicketId(format!("T{:04}", id.0.parse::<u16>().unwrap() + 1)))
+    }
+
+    pub fn get_next_project_id(&self) -> Option<ProjectId> {
+        let last_id = self.projects.last_key_value().map(|(id, _)| id);
+        last_id.map(|id| ProjectId(format!("P{:04}", id.0.parse::<u16>().unwrap() + 1)))
+    }
 }
 
 pub(crate) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
