@@ -83,13 +83,16 @@ pub(super) fn add_new_ticket(
 pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
     println!("Adding a new project");
     let in_repo_db = in_repo_db::collect_in_repo_db()?;
-    // TODO: figure out how to get rid of the below unwraps
+    let name = name.map(Ok).unwrap_or_else(get_user_input::get_proj_name)?;
+    let description = description
+        .map(Ok)
+        .unwrap_or_else(get_user_input::get_proj_desc)?;
     let project = Project::builder()
         .id(in_repo_db
             .get_next_project_id()
             .unwrap_or("P0001".to_owned().into()))
-        .name(name.unwrap_or_else(|| get_user_input::get_proj_name().unwrap()))
-        .description(description.unwrap_or_else(|| get_user_input::get_proj_desc().unwrap()))
+        .name(name)
+        .description(description)
         .extra(HashMap::new())
         .build();
     println!("{project}");
