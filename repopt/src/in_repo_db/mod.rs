@@ -2,7 +2,7 @@ pub mod structs;
 mod toml_utils;
 
 use serde::Serialize;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -18,16 +18,14 @@ type Result<T> = std::result::Result<T, Error>;
 pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
     let project_path = PathBuf::from(BASE_DIR).join(PROJECTS_DIR);
     let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
-
     let projects = collect_projects(&project_path)?;
-
     let tickets = collect_tickets(&ticket_path)?;
 
     Ok(InRepoDB::new(projects, tickets))
 }
 
-fn collect_tickets(ticket_path: &Path) -> Result<HashMap<TicketId, Ticket>> {
-    let tickets: HashMap<_, _> = toml_utils::get_toml_files_in_dir(ticket_path)?
+fn collect_tickets(ticket_path: &Path) -> Result<BTreeMap<TicketId, Ticket>> {
+    let tickets: BTreeMap<_, _> = toml_utils::get_toml_files_in_dir(ticket_path)?
         .into_iter()
         .map(|ticket_file| -> Result<_> {
             let ticket_contents = fs::read_to_string(ticket_file)?;
@@ -38,8 +36,8 @@ fn collect_tickets(ticket_path: &Path) -> Result<HashMap<TicketId, Ticket>> {
     Ok(tickets)
 }
 
-fn collect_projects(project_path: &Path) -> Result<HashMap<ProjectId, Project>> {
-    let projects: HashMap<ProjectId, Project> = toml_utils::get_toml_files_in_dir(project_path)?
+fn collect_projects(project_path: &Path) -> Result<BTreeMap<ProjectId, Project>> {
+    let projects: BTreeMap<ProjectId, Project> = toml_utils::get_toml_files_in_dir(project_path)?
         .into_iter()
         .map(|proj_file| -> Result<_> {
             let proj_contents = fs::read_to_string(proj_file)?;

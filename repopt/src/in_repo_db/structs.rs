@@ -2,7 +2,10 @@ use clap::ValueEnum;
 use derive_more::{Display, From};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, fmt};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt,
+};
 use typed_builder::TypedBuilder;
 
 #[derive(TypedBuilder)]
@@ -61,10 +64,14 @@ pub(crate) enum TicketType {
     Other,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From)]
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
 pub(crate) struct TicketId(String);
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From)]
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
 pub(crate) struct ProjectId(String);
 
 #[derive(TypedBuilder)]
@@ -112,13 +119,16 @@ impl Ticket {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
-    projects: HashMap<ProjectId, Project>,
-    tickets: HashMap<TicketId, Ticket>,
+    projects: BTreeMap<ProjectId, Project>,
+    tickets: BTreeMap<TicketId, Ticket>,
 }
 
 #[allow(dead_code)]
 impl InRepoDB {
-    pub fn new(projects: HashMap<ProjectId, Project>, tickets: HashMap<TicketId, Ticket>) -> Self {
+    pub fn new(
+        projects: BTreeMap<ProjectId, Project>,
+        tickets: BTreeMap<TicketId, Ticket>,
+    ) -> Self {
         InRepoDB { projects, tickets }
     }
 
