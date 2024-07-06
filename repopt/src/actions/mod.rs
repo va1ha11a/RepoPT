@@ -56,10 +56,18 @@ pub(super) fn add_new_ticket(
 ) -> Result<()> {
     let ticket = Ticket::builder()
         .id(Ulid::new().to_string().into())
-        .project(get_user_input::get_project_id().unwrap())
-        .title(title.unwrap_or_else(|| get_user_input::get_title().unwrap()))
-        .status(status.unwrap_or_else(|| get_user_input::get_ticket_status().unwrap()))
-        .ticket_type(ticket_type.unwrap_or_else(|| get_user_input::get_ticket_type().unwrap()))
+        .project(get_user_input::get_project_id()?)
+        .title(title.map(Ok).unwrap_or_else(get_user_input::get_title)?)
+        .status(
+            status
+                .map(Ok)
+                .unwrap_or_else(get_user_input::get_ticket_status)?,
+        )
+        .ticket_type(
+            ticket_type
+                .map(Ok)
+                .unwrap_or_else(get_user_input::get_ticket_type)?,
+        )
         .extra(HashMap::new())
         .build();
     println!("{ticket}");
