@@ -181,11 +181,13 @@ impl<'a, T> TicketFilters<'a> for T where T: Iterator<Item = &'a Ticket> + 'a {}
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_get_next_ticket_id() {
-        let mut in_repo_db = InRepoDB {
-            projects: BTreeMap::new(),
-            tickets: BTreeMap::new(),
+    fn setup_in_repo_db() -> InRepoDB {
+        let project_id = ProjectId("P0001".to_string());
+        let project = Project {
+            id: project_id.clone(),
+            name: "Test Project".to_string(),
+            description: "Test Description".to_string(),
+            extra: HashMap::new(),
         };
 
         let ticket_id = TicketId("T0001".to_string());
@@ -195,12 +197,20 @@ mod tests {
             status: TicketStatus::Open,
             ticket_type: TicketType::Bug,
             project: ProjectStub {
-                id: ProjectId("P0001".to_string()),
+                id: project_id.clone(),
             },
             extra: HashMap::new(),
         };
 
-        in_repo_db.tickets.insert(ticket_id, ticket);
+        InRepoDB {
+            projects: vec![(project_id, project)].into_iter().collect(),
+            tickets: vec![(ticket_id, ticket)].into_iter().collect(),
+        }
+    }
+
+    #[test]
+    fn test_get_next_ticket_id() {
+        let in_repo_db = setup_in_repo_db();
 
         let next_ticket_id = in_repo_db.get_next_ticket_id();
 
@@ -209,20 +219,7 @@ mod tests {
 
     #[test]
     fn test_get_next_project_id() {
-        let mut in_repo_db = InRepoDB {
-            projects: BTreeMap::new(),
-            tickets: BTreeMap::new(),
-        };
-
-        let project_id = ProjectId("P0001".to_string());
-        let project = Project {
-            id: project_id.clone(),
-            name: "Test Project".to_string(),
-            description: "Test Description".to_string(),
-            extra: HashMap::new(),
-        };
-
-        in_repo_db.projects.insert(project_id, project);
+        let in_repo_db = setup_in_repo_db();
 
         let next_project_id = in_repo_db.get_next_project_id();
 
