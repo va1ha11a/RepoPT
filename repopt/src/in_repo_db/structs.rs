@@ -2,7 +2,10 @@ use clap::ValueEnum;
 use derive_more::{Display, From};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{collections::HashMap, fmt};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fmt,
+};
 use typed_builder::TypedBuilder;
 
 #[derive(TypedBuilder)]
@@ -61,10 +64,14 @@ pub(crate) enum TicketType {
     Other,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From)]
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
 pub(crate) struct TicketId(String);
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From)]
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
 pub(crate) struct ProjectId(String);
 
 #[derive(TypedBuilder)]
@@ -112,13 +119,16 @@ impl Ticket {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
-    projects: HashMap<ProjectId, Project>,
-    tickets: HashMap<TicketId, Ticket>,
+    projects: BTreeMap<ProjectId, Project>,
+    tickets: BTreeMap<TicketId, Ticket>,
 }
 
 #[allow(dead_code)]
 impl InRepoDB {
-    pub fn new(projects: HashMap<ProjectId, Project>, tickets: HashMap<TicketId, Ticket>) -> Self {
+    pub fn new(
+        projects: BTreeMap<ProjectId, Project>,
+        tickets: BTreeMap<TicketId, Ticket>,
+    ) -> Self {
         InRepoDB { projects, tickets }
     }
 
@@ -137,6 +147,18 @@ impl InRepoDB {
     pub fn iter_tickets(&self) -> impl Iterator<Item = &Ticket> {
         self.tickets.values()
     }
+
+    pub fn get_next_ticket_id(&self) -> Option<TicketId> {
+        let last_id = self.tickets.last_key_value().map(|(id, _)| id)?;
+        let next_id = last_id.to_string().get(1..)?.parse::<u16>().unwrap() + 1;
+        Some(TicketId(format!("T{:04}", next_id)))
+    }
+
+    pub fn get_next_project_id(&self) -> Option<ProjectId> {
+        let last_id = self.projects.last_key_value().map(|(id, _)| id)?;
+        let next_id = last_id.to_string().get(1..)?.parse::<u16>().unwrap() + 1;
+        Some(ProjectId(format!("P{:04}", next_id)))
+    }
 }
 
 pub(crate) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
@@ -154,3 +176,56 @@ where
 
 // Implement the trait for all iterators that return a ticket reference with the same lifetime
 impl<'a, T> TicketFilters<'a> for T where T: Iterator<Item = &'a Ticket> + 'a {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_next_ticket_id() {
+        let mut in_repo_db = InRepoDB {
+            projects: BTreeMap::new(),
+            tickets: BTreeMap::new(),
+        };
+
+        let ticket_id = TicketId("T0001".to_string());
+        let ticket = Ticket {
+            id: ticket_id.clone(),
+            title: "Test Ticket".to_string(),
+            status: TicketStatus::Open,
+            ticket_type: TicketType::Bug,
+            project: ProjectStub {
+                id: ProjectId("P0001".to_string()),
+            },
+            extra: HashMap::new(),
+        };
+
+        in_repo_db.tickets.insert(ticket_id, ticket);
+
+        let next_ticket_id = in_repo_db.get_next_ticket_id();
+
+        assert_eq!(next_ticket_id, Some(TicketId("T0002".to_string())));
+    }
+
+    #[test]
+    fn test_get_next_project_id() {
+        let mut in_repo_db = InRepoDB {
+            projects: BTreeMap::new(),
+            tickets: BTreeMap::new(),
+        };
+
+        let project_id = ProjectId("P0001".to_string());
+        let project = Project {
+            id: project_id.clone(),
+            name: "Test Project".to_string(),
+            description: "Test Description".to_string(),
+            extra: HashMap::new(),
+        };
+
+        in_repo_db.projects.insert(project_id, project);
+
+        let next_project_id = in_repo_db.get_next_project_id();
+
+        assert_eq!(next_project_id, Some(ProjectId("P0002".to_string())));
+    }
+}
