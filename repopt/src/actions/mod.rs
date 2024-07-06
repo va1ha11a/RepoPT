@@ -54,22 +54,25 @@ pub(super) fn add_new_ticket(
     status: Option<TicketStatus>,
     ticket_type: Option<TicketType>,
 ) -> Result<()> {
+    let project_id = get_user_input::get_project_id()?;
+
+    let title = title.map(Ok).unwrap_or_else(get_user_input::get_title)?;
+    let status = status
+        .map(Ok)
+        .unwrap_or_else(get_user_input::get_ticket_status)?;
+    let ticket_type = ticket_type
+        .map(Ok)
+        .unwrap_or_else(get_user_input::get_ticket_type)?;
+
     let ticket = Ticket::builder()
         .id(Ulid::new().to_string().into())
-        .project(get_user_input::get_project_id()?)
-        .title(title.map(Ok).unwrap_or_else(get_user_input::get_title)?)
-        .status(
-            status
-                .map(Ok)
-                .unwrap_or_else(get_user_input::get_ticket_status)?,
-        )
-        .ticket_type(
-            ticket_type
-                .map(Ok)
-                .unwrap_or_else(get_user_input::get_ticket_type)?,
-        )
+        .project(project_id)
+        .title(title)
+        .status(status)
+        .ticket_type(ticket_type)
         .extra(HashMap::new())
         .build();
+
     println!("{ticket}");
     in_repo_db::verify_and_write(&ticket)?;
 
