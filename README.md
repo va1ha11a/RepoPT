@@ -1,6 +1,6 @@
-# Project README
+# RepoPT
 
-This project  aims to create an in repo database (currently of TOML files) that can function as a version controlled ticket/work management system.
+This project aims to create an in repo database (currently of TOML files) that can function as a version controlled ticket/work management system.
 
 ## Getting Started
 
