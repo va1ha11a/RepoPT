@@ -1,7 +1,7 @@
-use clap::Parser;
-
+mod actions;
 mod in_repo_db;
 
+use clap::Parser;
 use in_repo_db::structs::{TicketStatus, TicketType};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
@@ -84,5 +84,3 @@ fn main() -> Result<()> {
 
     Ok(())
 }
-
-mod actions;

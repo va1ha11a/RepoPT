@@ -1,10 +1,9 @@
-use std::collections::HashMap;
-use ulid::Ulid;
-
 mod get_user_input;
 
 use crate::in_repo_db;
 use crate::in_repo_db::structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
+use std::collections::HashMap;
+use ulid::Ulid;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;

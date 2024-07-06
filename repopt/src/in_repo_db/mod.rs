@@ -1,19 +1,16 @@
 pub mod structs;
 mod toml_utils;
 
-use structs::{InRepoDB, Project, ProjectId, Ticket, TicketId};
-
 use serde::Serialize;
-
 use std::collections::HashMap;
 use std::fs::{self, File};
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use structs::{InRepoDB, Project, ProjectId, Ticket, TicketId};
 
 const BASE_DIR: &str = "example_data";
 const PROJECTS_DIR: &str = "projects";
 const TICKETS_DIR: &str = "tickets";
-
-use std::io::Write;
-use std::path::{Path, PathBuf};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
