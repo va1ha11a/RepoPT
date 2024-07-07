@@ -1,6 +1,6 @@
 id = "T0002"
 title = "Implement TOML configuration parsing in a much cooler way"
-status = "Open"
+status = "Backlog"
 type = "Feature"
 
 [project]

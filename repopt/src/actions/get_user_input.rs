@@ -30,11 +30,22 @@ pub(super) fn get_ticket_type() -> Result<TicketType> {
     }
 }
 
-pub(super) fn get_ticket_status() -> Result<TicketStatus> {
-    let options = vec!["Open", "In Progress", "Closed"];
+#[allow(dead_code)]
+pub(super) enum TicketStatusTypes {
+    All,
+    OnlyOpen,
+    OnlyClosed,
+}
+
+pub(super) fn get_ticket_status(status_types: TicketStatusTypes) -> Result<TicketStatus> {
+    let options = match status_types {
+        TicketStatusTypes::All => vec!["Backlog", "In Progress", "Closed"],
+        TicketStatusTypes::OnlyOpen => vec!["Backlog", "In Progress"],
+        TicketStatusTypes::OnlyClosed => vec!["Closed"],
+    };
     let ans = Select::new("Select Ticket Status:", options).prompt();
     match ans {
-        Ok("Open") => Ok(TicketStatus::Open),
+        Ok("Backlog") => Ok(TicketStatus::Backlog),
         Ok("In Progress") => Ok(TicketStatus::InProgress),
         Ok("Closed") => Ok(TicketStatus::Closed),
         _ => Err(From::from("Invalid Ticket Status")),
@@ -56,7 +67,7 @@ pub(super) fn get_project_id() -> Result<ProjectStub> {
 }
 
 pub(super) fn select_open_ticket() -> Result<Ticket> {
-    let tickets = list_ticket_by_status(TicketStatus::Open)?;
+    let tickets = list_ticket_by_status(vec![TicketStatus::Backlog, TicketStatus::InProgress])?;
     select_tickets(tickets)
 }
 
