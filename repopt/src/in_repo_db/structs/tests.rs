@@ -13,7 +13,7 @@ fn setup_in_repo_db_one() -> InRepoDB {
     let ticket = Ticket {
         id: ticket_id.clone(),
         title: "Test Ticket".to_string(),
-        status: TicketStatus::Open,
+        status: TicketStatus::Backlog,
         ticket_type: TicketType::Bug,
         project: ProjectStub {
             id: project_id.clone(),
@@ -74,11 +74,11 @@ fn test_iter_tickets() {
 #[test]
 fn test_with_status() {
     let in_repo_db = setup_in_repo_db_one();
-    let open_tickets: Vec<&Ticket> = in_repo_db
+    let backlog_tickets: Vec<&Ticket> = in_repo_db
         .iter_tickets()
-        .with_status(TicketStatus::Open)
+        .with_status(TicketStatus::Backlog)
         .collect();
-    assert_eq!(open_tickets.len(), 1);
+    assert_eq!(backlog_tickets.len(), 1);
 }
 
 #[test]

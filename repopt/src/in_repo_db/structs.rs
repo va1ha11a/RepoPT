@@ -44,12 +44,18 @@ pub(crate) struct ProjectStub {
 
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketStatus {
-    #[display(fmt = "Open")]
-    Open,
+    #[display(fmt = "Backlog")]
+    Backlog,
     #[display(fmt = "In Progress")]
     InProgress,
     #[display(fmt = "Closed")]
     Closed,
+}
+
+impl From<TicketStatus> for Vec<TicketStatus> {
+    fn from(status: TicketStatus) -> Vec<TicketStatus> {
+        vec![status]
+    }
 }
 
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
@@ -101,7 +107,7 @@ impl fmt::Display for Ticket {
 #[allow(dead_code)]
 impl Ticket {
     pub(crate) fn is_open(&self) -> bool {
-        self.status == TicketStatus::Open
+        self.status != TicketStatus::Closed
     }
 
     pub(crate) fn get_project_id(&self) -> &ProjectId {
@@ -112,8 +118,8 @@ impl Ticket {
         self.status = TicketStatus::Closed;
     }
 
-    pub(crate) fn reopen(&mut self) {
-        self.status = TicketStatus::Open;
+    pub(crate) fn reopen(&mut self, status: Option<TicketStatus>) {
+        self.status = status.unwrap_or(TicketStatus::InProgress);
     }
 }
 
@@ -165,8 +171,12 @@ pub(crate) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
 where
     Self: 'a,
 {
-    fn with_status(self, status: TicketStatus) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
-        Box::new(self.filter(move |ticket| ticket.status == status))
+    fn with_status<S>(self, status: S) -> Box<dyn Iterator<Item = &'a Ticket> + 'a>
+    where
+        S: Into<Vec<TicketStatus>>,
+    {
+        let statuses = status.into();
+        Box::new(self.filter(move |ticket| statuses.contains(&ticket.status)))
     }
 
     fn with_type(self, ticket_type: TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {

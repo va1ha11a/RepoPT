@@ -1,5 +1,7 @@
 mod get_user_input;
 
+use get_user_input::TicketStatusTypes;
+
 use crate::in_repo_db;
 use crate::in_repo_db::structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
 use std::collections::HashMap;
@@ -58,7 +60,7 @@ pub(super) fn add_new_ticket(
     let title = title.map(Ok).unwrap_or_else(get_user_input::get_title)?;
     let status = status
         .map(Ok)
-        .unwrap_or_else(get_user_input::get_ticket_status)?;
+        .unwrap_or_else(|| get_user_input::get_ticket_status(TicketStatusTypes::All))?;
     let ticket_type = ticket_type
         .map(Ok)
         .unwrap_or_else(get_user_input::get_ticket_type)?;
@@ -112,18 +114,22 @@ pub(super) fn close_ticket() -> Result<()> {
 pub(super) fn reopen_ticket() -> Result<()> {
     println!("Reopening a ticket");
     let mut ticket = get_user_input::select_closed_ticket()?;
-    ticket.reopen();
-
+    let status = get_user_input::get_ticket_status(TicketStatusTypes::OnlyOpen)?;
+    ticket.reopen(Some(status));
     in_repo_db::verify_and_write(&ticket)?;
     Ok(())
 }
 
-pub(super) fn list_ticket_by_status(list_status: TicketStatus) -> Result<Vec<Ticket>> {
+pub(super) fn list_ticket_by_status<S>(list_status: S) -> Result<Vec<Ticket>>
+where
+    S: Into<Vec<TicketStatus>>,
+{
+    let statuses = list_status.into();
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
     let tickets = in_repo_db
         .iter_tickets()
-        .with_status(list_status)
+        .with_status(statuses)
         .cloned()
         .collect();
     Ok(tickets)
