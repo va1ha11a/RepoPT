@@ -30,7 +30,7 @@ fn collect_tickets(ticket_path: &Path) -> Result<BTreeMap<TicketId, Ticket>> {
         .map(|ticket_file| -> Result<_> {
             let ticket_contents = fs::read_to_string(ticket_file)?;
             let ticket: Ticket = toml::from_str(&ticket_contents)?;
-            Ok((ticket.id.clone(), ticket))
+            Ok((ticket.id().clone(), ticket))
         })
         .collect::<Result<_>>()?;
     Ok(tickets)
@@ -42,7 +42,7 @@ fn collect_projects(project_path: &Path) -> Result<BTreeMap<ProjectId, Project>>
         .map(|proj_file| -> Result<_> {
             let proj_contents = fs::read_to_string(proj_file)?;
             let project: Project = toml::from_str(&proj_contents)?;
-            Ok((project.id.clone(), project))
+            Ok((project.id().clone(), project))
         })
         .collect::<Result<_>>()?;
     Ok(projects)
@@ -55,7 +55,7 @@ pub(crate) trait IRDBWritableObject: Serialize {
 
 impl IRDBWritableObject for Ticket {
     fn fmt_stub(&self) -> String {
-        self.id.to_string()
+        self.id().to_string()
     }
     fn select_path(&self) -> PathBuf {
         PathBuf::from(BASE_DIR).join(TICKETS_DIR)
@@ -64,7 +64,7 @@ impl IRDBWritableObject for Ticket {
 
 impl IRDBWritableObject for Project {
     fn fmt_stub(&self) -> String {
-        self.id.to_string()
+        self.id().to_string()
     }
     fn select_path(&self) -> PathBuf {
         PathBuf::from(BASE_DIR).join(PROJECTS_DIR)

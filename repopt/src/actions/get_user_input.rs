@@ -56,12 +56,12 @@ pub(super) fn get_project_id() -> Result<ProjectStub> {
     let projects = get_projects()?;
     let options: Vec<String> = projects
         .iter()
-        .map(|project| project.name.clone())
+        .map(|project| project.name().to_string())
         .collect();
     let ans = Select::new("Select a project:", options).prompt()?;
     let selected_project = projects
         .into_iter()
-        .find(|project| project.name == ans)
+        .find(|project| project.name() == ans)
         .ok_or("Invalid Project")?;
     Ok(selected_project.into())
 }
@@ -77,11 +77,14 @@ pub(super) fn select_closed_ticket() -> Result<Ticket> {
 }
 
 fn select_tickets(tickets: Vec<Ticket>) -> Result<Ticket> {
-    let options: Vec<String> = tickets.iter().map(|ticket| ticket.title.clone()).collect();
+    let options: Vec<String> = tickets
+        .iter()
+        .map(|ticket| ticket.title().to_string())
+        .collect();
     let ans = Select::new("Select a ticket:", options).prompt()?;
     let selected_ticket = tickets
         .into_iter()
-        .find(|ticket| ticket.title == ans)
+        .find(|ticket| ticket.title() == ans)
         .ok_or("Invalid Ticket")?;
     Ok(selected_ticket)
 }
