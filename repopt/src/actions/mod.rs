@@ -57,7 +57,9 @@ pub(super) fn add_new_ticket(
     let in_repo_db = in_repo_db::collect_in_repo_db()?;
     let project_id = get_user_input::get_project_id()?;
 
-    let title = title.map(Ok).unwrap_or_else(get_user_input::get_title)?;
+    let title = title
+        .map(|t| Ok(t.into()))
+        .unwrap_or_else(get_user_input::get_title)?;
     let status = status
         .map(Ok)
         .unwrap_or_else(|| get_user_input::get_ticket_status(TicketStatusTypes::All))?;
@@ -85,9 +87,11 @@ pub(super) fn add_new_ticket(
 pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
     println!("Adding a new project");
     let in_repo_db = in_repo_db::collect_in_repo_db()?;
-    let name = name.map(Ok).unwrap_or_else(get_user_input::get_proj_name)?;
+    let name = name
+        .map(|t| Ok(t.into()))
+        .unwrap_or_else(get_user_input::get_proj_name)?;
     let description = description
-        .map(Ok)
+        .map(|t| Ok(t.into()))
         .unwrap_or_else(get_user_input::get_proj_desc)?;
     let project = Project::builder()
         .id(in_repo_db

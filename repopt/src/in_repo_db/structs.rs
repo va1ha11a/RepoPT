@@ -8,13 +8,26 @@ use std::{
 };
 use typed_builder::TypedBuilder;
 
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
+pub(crate) struct ProjectId(String);
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
+pub(crate) struct ProjectName(String);
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
+pub(crate) struct ProjectDescription(String);
+
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Project {
     id: ProjectId,
-    name: String,        // TODO: Create NewType
-    description: String, // TODO: Create NewType
+    name: ProjectName,
+    description: ProjectDescription,
     // Other fields...
     #[serde(flatten)]
     extra: HashMap<String, Value>,
@@ -25,7 +38,7 @@ impl Project {
         &self.id
     }
 
-    pub(crate) fn name(&self) -> &str {
+    pub(crate) fn name(&self) -> &ProjectName {
         &self.name
     }
 }
@@ -49,7 +62,7 @@ impl fmt::Display for Project {
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Display, Clone)]
 pub(crate) struct ProjectStub {
-    pub(crate) id: ProjectId, // TODO: Getter rather than public field?
+    id: ProjectId,
 }
 
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
@@ -88,14 +101,14 @@ pub(crate) struct TicketId(String);
 #[derive(
     Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
 )]
-pub(crate) struct ProjectId(String);
+pub(crate) struct TicketTitle(String);
 
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Ticket {
     id: TicketId,
-    title: String, // TODO: Create NewType
+    title: TicketTitle,
     status: TicketStatus,
     #[serde(rename = "type")]
     ticket_type: TicketType,
@@ -120,7 +133,7 @@ impl Ticket {
         &self.id
     }
 
-    pub(crate) fn title(&self) -> &str {
+    pub(crate) fn title(&self) -> &TicketTitle {
         &self.title
     }
 
