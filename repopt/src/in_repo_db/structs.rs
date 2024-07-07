@@ -12,12 +12,22 @@ use typed_builder::TypedBuilder;
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Project {
-    pub(crate) id: ProjectId,
-    pub(crate) name: String, // TODO: Create NewType
-    description: String,     // TODO: Create NewType
+    id: ProjectId,
+    name: String,        // TODO: Create NewType
+    description: String, // TODO: Create NewType
     // Other fields...
     #[serde(flatten)]
     extra: HashMap<String, Value>,
+}
+
+impl Project {
+    pub(crate) fn id(&self) -> &ProjectId {
+        &self.id
+    }
+
+    pub(crate) fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 impl From<Project> for ProjectStub {
@@ -39,7 +49,7 @@ impl fmt::Display for Project {
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Display, Clone)]
 pub(crate) struct ProjectStub {
-    pub(crate) id: ProjectId,
+    pub(crate) id: ProjectId, // TODO: Getter rather than public field?
 }
 
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
@@ -84,8 +94,8 @@ pub(crate) struct ProjectId(String);
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct Ticket {
-    pub(crate) id: TicketId,
-    pub(crate) title: String, // TODO: Create NewType
+    id: TicketId,
+    title: String, // TODO: Create NewType
     status: TicketStatus,
     #[serde(rename = "type")]
     ticket_type: TicketType,
@@ -106,6 +116,14 @@ impl fmt::Display for Ticket {
 
 #[allow(dead_code)]
 impl Ticket {
+    pub(crate) fn id(&self) -> &TicketId {
+        &self.id
+    }
+
+    pub(crate) fn title(&self) -> &str {
+        &self.title
+    }
+
     pub(crate) fn is_open(&self) -> bool {
         self.status != TicketStatus::Closed
     }
