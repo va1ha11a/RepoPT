@@ -1,23 +1,25 @@
 use super::{get_projects, list_ticket_by_status};
-use crate::in_repo_db::structs::{ProjectStub, Ticket, TicketStatus, TicketType};
+use crate::in_repo_db::structs::{
+    ProjectDescription, ProjectName, ProjectStub, Ticket, TicketStatus, TicketTitle, TicketType,
+};
 use inquire::{Select, Text};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
-pub(super) fn get_title() -> Result<String> {
+pub(super) fn get_title() -> Result<TicketTitle> {
     let title = Text::new("Enter Ticket Title:").prompt()?;
-    Ok(title)
+    Ok(title.into())
 }
 
-pub(super) fn get_proj_name() -> Result<String> {
+pub(super) fn get_proj_name() -> Result<ProjectName> {
     let title = Text::new("Enter Project Name:").prompt()?;
-    Ok(title)
+    Ok(title.into())
 }
 
-pub(super) fn get_proj_desc() -> Result<String> {
+pub(super) fn get_proj_desc() -> Result<ProjectDescription> {
     let title = Text::new("Enter Project Description:").prompt()?;
-    Ok(title)
+    Ok(title.into())
 }
 
 pub(super) fn get_ticket_type() -> Result<TicketType> {
@@ -61,7 +63,7 @@ pub(super) fn get_project_id() -> Result<ProjectStub> {
     let ans = Select::new("Select a project:", options).prompt()?;
     let selected_project = projects
         .into_iter()
-        .find(|project| project.name() == ans)
+        .find(|project| project.name().to_string() == ans)
         .ok_or("Invalid Project")?;
     Ok(selected_project.into())
 }
@@ -84,7 +86,7 @@ fn select_tickets(tickets: Vec<Ticket>) -> Result<Ticket> {
     let ans = Select::new("Select a ticket:", options).prompt()?;
     let selected_ticket = tickets
         .into_iter()
-        .find(|ticket| ticket.title() == ans)
+        .find(|ticket| ticket.title().to_string() == ans)
         .ok_or("Invalid Ticket")?;
     Ok(selected_ticket)
 }

@@ -4,15 +4,15 @@ fn setup_in_repo_db_one() -> InRepoDB {
     let project_id = ProjectId("P0001".to_string());
     let project = Project {
         id: project_id.clone(),
-        name: "Test Project".to_string(),
-        description: "Test Description".to_string(),
+        name: "Test Project".to_string().into(),
+        description: "Test Description".to_string().into(),
         extra: HashMap::new(),
     };
 
     let ticket_id = TicketId("T0001".to_string());
     let ticket = Ticket {
         id: ticket_id.clone(),
-        title: "Test Ticket".to_string(),
+        title: "Test Ticket".to_string().into(),
         status: TicketStatus::Backlog,
         ticket_type: TicketType::Bug,
         project: ProjectStub {
