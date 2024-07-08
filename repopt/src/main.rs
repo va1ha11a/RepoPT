@@ -9,6 +9,16 @@ type Error = Box<dyn std::error::Error>; // replace this with set error types fo
 type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Parser, Debug)]
+#[command(name = "RepoRT", about = "CLI for RepoRT: In Repo Ticketing System")]
+struct Cli {
+    #[arg(long, default_value = "json")]
+    format: String,
+
+    #[command(subcommand)]
+    base_command: BaseCommands,
+}
+
+#[derive(Parser, Debug)]
 enum BaseCommands {
     #[clap(name = "init", about = "Initialize a new repository")]
     Init,
@@ -62,9 +72,9 @@ struct ListOptions {
 }
 
 fn main() -> Result<()> {
-    let base_command = BaseCommands::parse();
+    let cli = Cli::parse();
 
-    match base_command {
+    match cli.base_command {
         BaseCommands::Init => actions::init_new_repository(),
         BaseCommands::Add(AddOptions::Ticket(ticket_options)) => actions::add_new_ticket(
             ticket_options.title,
