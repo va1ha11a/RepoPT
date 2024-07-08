@@ -4,16 +4,18 @@ use get_user_input::TicketStatusTypes;
 
 use crate::in_repo_db;
 use crate::in_repo_db::structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
+use crate::output_formatter::{GenerateOutputFormat, OutputFormatter};
 use std::collections::HashMap;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
+const OUTPUT_FORMATTER: OutputFormatter = OutputFormatter::Json;
+
 pub(super) fn list_all_tickets(
     filter_on_status: Option<TicketStatus>,
     filter_on_type: Option<TicketType>,
 ) -> Result<()> {
-    println!("Listing all tickets");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let binding = in_repo_db?;
     let mut iter = Box::new(binding.iter_tickets()) as Box<dyn Iterator<Item = &Ticket>>;
@@ -23,16 +25,18 @@ pub(super) fn list_all_tickets(
     if let Some(ticket_type) = filter_on_type {
         iter = iter.with_type(ticket_type);
     }
-    Ok(iter.for_each(|t| println!("{t}\n")))
+    let out_string = OUTPUT_FORMATTER.try_format_multiple(&iter.collect::<Vec<&Ticket>>())?;
+    println!("{}", out_string);
+    Ok(())
 }
 
 pub(super) fn show_ticket(id: String) -> Result<()> {
-    println!("Showing a ticket with id: {id}");
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
     let ticket = in_repo_db.get_ticket(&id.into());
     if let Some(ticket) = ticket {
-        println!("{ticket:#?}");
+        let out_string = OUTPUT_FORMATTER.try_format_single(ticket)?;
+        println!("{}", out_string);
     } else {
         return Err(From::from("Ticket not found."));
     };

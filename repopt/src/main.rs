@@ -1,5 +1,6 @@
 mod actions;
 mod in_repo_db;
+mod output_formatter;
 
 use clap::Parser;
 use in_repo_db::structs::{TicketStatus, TicketType};
