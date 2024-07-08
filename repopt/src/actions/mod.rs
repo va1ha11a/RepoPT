@@ -23,7 +23,7 @@ pub(super) fn list_all_tickets(
     if let Some(ticket_type) = filter_on_type {
         iter = iter.with_type(ticket_type);
     }
-    Ok(iter.for_each(|t| println!("{t:#?}")))
+    Ok(iter.for_each(|t| println!("{t}\n")))
 }
 
 pub(super) fn show_ticket(id: String) -> Result<()> {

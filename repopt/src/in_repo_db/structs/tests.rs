@@ -3,16 +3,16 @@ use super::*;
 fn setup_in_repo_db_one() -> InRepoDB {
     let project_id = ProjectId("P0001".to_string());
     let project = Project {
-        id: project_id.clone(),
-        name: "Test Project".to_string().into(),
-        description: "Test Description".to_string().into(),
+        id: project_id.to_owned(),
+        name: "Test Project".into(),
+        description: "Test Description".into(),
         extra: HashMap::new(),
     };
 
     let ticket_id = TicketId("T0001".to_string());
     let ticket = Ticket {
-        id: ticket_id.clone(),
-        title: "Test Ticket".to_string().into(),
+        id: ticket_id.to_owned(),
+        title: "Test Ticket".into(),
         status: TicketStatus::Backlog,
         ticket_type: TicketType::Bug,
         project: ProjectStub {

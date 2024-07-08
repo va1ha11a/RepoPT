@@ -2,28 +2,34 @@ use clap::ValueEnum;
 use derive_more::{Display, From};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::{
-    collections::{BTreeMap, HashMap},
-    fmt,
-};
+use std::collections::{BTreeMap, HashMap};
 use typed_builder::TypedBuilder;
 
 #[derive(
     Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
 )]
+#[from(forward)]
 pub(crate) struct ProjectId(String);
 #[derive(
     Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
 )]
+#[from(forward)]
 pub(crate) struct ProjectName(String);
 #[derive(
     Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
 )]
+#[from(forward)]
 pub(crate) struct ProjectDescription(String);
 
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Display)]
+#[display(
+    fmt = "Project ID: {}\nName: {}\nDescription: {}",
+    id,
+    name,
+    description
+)]
 pub(crate) struct Project {
     id: ProjectId,
     name: ProjectName,
@@ -46,16 +52,6 @@ impl Project {
 impl From<Project> for ProjectStub {
     fn from(project: Project) -> Self {
         ProjectStub { id: project.id }
-    }
-}
-
-impl fmt::Display for Project {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Project ID: {}\nName: {}\nDescription: {}",
-            self.id, self.name, self.description
-        )
     }
 }
 
@@ -96,16 +92,24 @@ pub(crate) enum TicketType {
 #[derive(
     Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
 )]
+#[from(forward)]
 pub(crate) struct TicketId(String);
 
 #[derive(
     Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
 )]
+#[from(forward)]
 pub(crate) struct TicketTitle(String);
 
-#[derive(TypedBuilder)]
-#[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(TypedBuilder, Serialize, Deserialize, Debug, Clone, Display)]
+#[display(
+    fmt = "ID: {}\nTitle: {}\nStatus: {}\nType: {}\nProject ID: {}",
+    id,
+    title,
+    status,
+    ticket_type,
+    project
+)]
 pub(crate) struct Ticket {
     id: TicketId,
     title: TicketTitle,
@@ -116,15 +120,6 @@ pub(crate) struct Ticket {
     // Other fields...
     #[serde(flatten)]
     extra: HashMap<String, Value>,
-}
-impl fmt::Display for Ticket {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Ticket ID: {}\nTitle: {}\nStatus: {}\nType: {}\nProject ID: {}",
-            self.id, self.title, self.status, self.ticket_type, self.project.id
-        )
-    }
 }
 
 #[allow(dead_code)]
