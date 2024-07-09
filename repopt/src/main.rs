@@ -12,7 +12,7 @@ type Result<T> = std::result::Result<T, Error>;
 #[command(name = "RepoRT", about = "CLI for RepoRT: In Repo Ticketing System")]
 struct Cli {
     #[arg(long, default_value = "json")]
-    format: String,
+    format: output_formatter::OutputFormatter,
 
     #[command(subcommand)]
     base_command: BaseCommands,

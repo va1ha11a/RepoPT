@@ -1,9 +1,11 @@
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
+use clap::ValueEnum;
 use serde::Serialize;
 
 #[allow(dead_code)]
+#[derive(Debug, Clone, Copy, ValueEnum)]
 pub(crate) enum OutputFormatter {
     Json,
     Yaml,
