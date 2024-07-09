@@ -2,11 +2,24 @@ mod actions;
 mod in_repo_db;
 mod output_formatter;
 
+use std::sync::Mutex;
+
 use clap::Parser;
 use in_repo_db::structs::{TicketStatus, TicketType};
+use lazy_static::lazy_static;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
+
+pub(crate) struct Config {
+    pub format: output_formatter::OutputFormatter,
+}
+
+lazy_static! {
+    pub(crate) static ref CONFIG: Mutex<Config> = Mutex::new(Config {
+        format: output_formatter::OutputFormatter::Json
+    });
+}
 
 #[derive(Parser, Debug)]
 #[command(name = "RepoRT", about = "CLI for RepoRT: In Repo Ticketing System")]
@@ -73,6 +86,11 @@ struct ListOptions {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+
+    {
+        let mut config = CONFIG.lock()?;
+        config.format = cli.format;
+    }
 
     match cli.base_command {
         BaseCommands::Init => actions::init_new_repository(),
