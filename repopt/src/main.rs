@@ -24,7 +24,7 @@ lazy_static! {
 #[derive(Parser, Debug)]
 #[command(name = "RepoRT", about = "CLI for RepoRT: In Repo Ticketing System")]
 struct Cli {
-    #[arg(long, default_value = "json")]
+    #[arg(long, default_value = "json", global = true)]
     format: output_formatter::OutputFormatter,
 
     #[command(subcommand)]
