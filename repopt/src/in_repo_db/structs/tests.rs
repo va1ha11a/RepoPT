@@ -3,7 +3,7 @@ use super::*;
 fn setup_in_repo_db_one() -> InRepoDB {
     let project_id = ProjectId("P0001".to_string());
     let project = Project {
-        id: project_id.to_owned(),
+        id: project_id.clone(),
         name: "Test Project".into(),
         description: "Test Description".into(),
         extra: HashMap::new(),
@@ -11,7 +11,7 @@ fn setup_in_repo_db_one() -> InRepoDB {
 
     let ticket_id = TicketId("T0001".to_string());
     let ticket = Ticket {
-        id: ticket_id.to_owned(),
+        id: ticket_id.clone(),
         title: "Test Ticket".into(),
         status: TicketStatus::Backlog,
         ticket_type: TicketType::Bug,
@@ -46,7 +46,7 @@ fn test_get_project() {
     let in_repo_db = setup_in_repo_db_one();
     let project_id = ProjectId("P0001".to_string());
     let project = in_repo_db.get_project(&project_id);
-    assert_eq!(project.is_some(), true);
+    assert!(project.is_some());
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn test_get_ticket() {
     let in_repo_db = setup_in_repo_db_one();
     let ticket_id = TicketId("T0001".to_string());
     let ticket = in_repo_db.get_ticket(&ticket_id);
-    assert_eq!(ticket.is_some(), true);
+    assert!(ticket.is_some());
 }
 
 #[test]

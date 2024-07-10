@@ -64,15 +64,12 @@ pub(super) fn add_new_ticket(
     let in_repo_db = in_repo_db::collect_in_repo_db()?;
     let project_id = get_user_input::get_project_id()?;
 
-    let title = title
-        .map(|t| Ok(t.into()))
-        .unwrap_or_else(get_user_input::get_title)?;
-    let status = status
-        .map(Ok)
-        .unwrap_or_else(|| get_user_input::get_ticket_status(&TicketStatusTypes::All))?;
-    let ticket_type = ticket_type
-        .map(Ok)
-        .unwrap_or_else(get_user_input::get_ticket_type)?;
+    let title = title.map_or_else(get_user_input::get_title, |t| Ok(t.into()))?;
+    let status = status.map_or_else(
+        || get_user_input::get_ticket_status(&TicketStatusTypes::All),
+        Ok,
+    )?;
+    let ticket_type = ticket_type.map_or_else(get_user_input::get_ticket_type, Ok)?;
 
     let ticket = Ticket::builder()
         .id(in_repo_db
@@ -94,12 +91,8 @@ pub(super) fn add_new_ticket(
 pub(super) fn add_new_project(name: Option<String>, description: Option<String>) -> Result<()> {
     println!("Adding a new project");
     let in_repo_db = in_repo_db::collect_in_repo_db()?;
-    let name = name
-        .map(|t| Ok(t.into()))
-        .unwrap_or_else(get_user_input::get_proj_name)?;
-    let description = description
-        .map(|t| Ok(t.into()))
-        .unwrap_or_else(get_user_input::get_proj_desc)?;
+    let name = name.map_or_else(get_user_input::get_proj_name, |t| Ok(t.into()))?;
+    let description = description.map_or_else(get_user_input::get_proj_desc, |t| Ok(t.into()))?;
     let project = Project::builder()
         .id(in_repo_db
             .get_next_project_id()
