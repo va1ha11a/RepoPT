@@ -100,6 +100,7 @@ pub(crate) struct TicketTitle(String);
 #[display(
     fmt = "ID: {id}\nTitle: {title}\nStatus: {status}\nType: {ticket_type}\nProject ID: {project}"
 )]
+#[allow(clippy::struct_field_names)]
 pub(crate) struct Ticket {
     id: TicketId,
     title: TicketTitle,

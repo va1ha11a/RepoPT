@@ -1,8 +1,13 @@
 [package]
 name = "repopt"
 version = "0.1.0"
-edition = "2021"
+description = "In Repo Ticketing System"
 license = "MIT"
+repository = "https://github.com/va1ha11a/RepoPT"
+readme = "README.md"
+keywords = ["project", "ticket", "git", "tool"]
+categories = ["development-tools", "git-tools"]
+edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.7", features = ["derive"] }
@@ -16,6 +21,14 @@ toml = "0.8.14"
 typed-builder = "0.18.2"
 
 [lints.clippy]
+#multiple_crate_versions = "warn"
 enum_glob_use = "deny"
-pedantic = "warn"
 uninlined_format_args = "warn"
+pedantic = "warn"
+complexity = "warn"
+suspicious = "warn"
+correctness = "warn"
+style = "warn"
+perf = "warn"
+#cargo = "warn"
+#restriction = "warn"
