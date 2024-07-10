@@ -4,16 +4,21 @@ mod output_formatter;
 
 use clap::Parser;
 use in_repo_db::structs::{TicketStatus, TicketType};
-use std::sync::OnceLock;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
-pub(crate) struct Config {
-    pub format: output_formatter::OutputFormatter,
-}
+mod config {
+    use std::sync::OnceLock;
 
-pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
+    use crate::output_formatter::OutputFormatter;
+
+    pub(crate) struct Config {
+        pub formatter: OutputFormatter,
+    }
+
+    pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
+}
 
 #[derive(Parser, Debug)]
 #[command(name = "RepoRT", about = "CLI for RepoRT: In Repo Ticketing System")]
@@ -81,7 +86,9 @@ struct ListOptions {
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    let _ = CONFIG.set(Config { format: cli.format });
+    let _ = config::CONFIG.set(config::Config {
+        formatter: cli.format,
+    });
 
     match cli.base_command {
         BaseCommands::Init => actions::init_new_repository(),

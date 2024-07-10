@@ -2,10 +2,10 @@ mod get_user_input;
 
 use get_user_input::TicketStatusTypes;
 
+use crate::config::CONFIG;
 use crate::in_repo_db;
 use crate::in_repo_db::structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
 use crate::output_formatter::GenerateOutputFormat;
-use crate::CONFIG;
 use std::collections::HashMap;
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
@@ -16,7 +16,6 @@ pub(super) fn list_all_tickets(
     filter_on_type: Option<TicketType>,
 ) -> Result<()> {
     let config = CONFIG.get().ok_or("Config not initialized")?;
-    let output_formatter = config.format;
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let binding = in_repo_db?;
     let mut iter = Box::new(binding.iter_tickets()) as Box<dyn Iterator<Item = &Ticket>>;
@@ -26,19 +25,20 @@ pub(super) fn list_all_tickets(
     if let Some(ticket_type) = filter_on_type {
         iter = iter.with_type(ticket_type);
     }
-    let out_string = output_formatter.try_format_multiple(&iter.collect::<Vec<&Ticket>>())?;
+    let out_string = config
+        .formatter
+        .try_format_multiple(&iter.collect::<Vec<&Ticket>>())?;
     println!("{out_string}");
     Ok(())
 }
 
 pub(super) fn show_ticket(id: String) -> Result<()> {
     let config = CONFIG.get().ok_or("Config not initialized")?;
-    let output_formatter = config.format;
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
     let ticket = in_repo_db.get_ticket(&id.into());
     if let Some(ticket) = ticket {
-        let out_string = output_formatter.try_format_single(ticket)?;
+        let out_string = config.formatter.try_format_single(ticket)?;
         println!("{out_string}");
     } else {
         return Err(From::from("Ticket not found."));
