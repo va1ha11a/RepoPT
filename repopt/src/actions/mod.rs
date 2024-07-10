@@ -15,7 +15,7 @@ pub(super) fn list_all_tickets(
     filter_on_status: Option<TicketStatus>,
     filter_on_type: Option<TicketType>,
 ) -> Result<()> {
-    let config = CONFIG.lock()?;
+    let config = CONFIG.get().ok_or("Config not initialized")?;
     let output_formatter = config.format;
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let binding = in_repo_db?;
@@ -32,7 +32,7 @@ pub(super) fn list_all_tickets(
 }
 
 pub(super) fn show_ticket(id: String) -> Result<()> {
-    let config = CONFIG.lock()?;
+    let config = CONFIG.get().ok_or("Config not initialized")?;
     let output_formatter = config.format;
     let in_repo_db = in_repo_db::collect_in_repo_db();
     let in_repo_db = in_repo_db?;
