@@ -24,12 +24,7 @@ pub(crate) struct ProjectDescription(String);
 #[derive(TypedBuilder)]
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Clone, Display)]
-#[display(
-    fmt = "Project ID: {}\nName: {}\nDescription: {}",
-    id,
-    name,
-    description
-)]
+#[display(fmt = "Project ID: {id}\nName: {name}\nDescription: {description}")]
 pub(crate) struct Project {
     id: ProjectId,
     name: ProjectName,
@@ -103,12 +98,7 @@ pub(crate) struct TicketTitle(String);
 
 #[derive(TypedBuilder, Serialize, Deserialize, Debug, Clone, Display)]
 #[display(
-    fmt = "ID: {}\nTitle: {}\nStatus: {}\nType: {}\nProject ID: {}",
-    id,
-    title,
-    status,
-    ticket_type,
-    project
+    fmt = "ID: {id}\nTitle: {title}\nStatus: {status}\nType: {ticket_type}\nProject ID: {project}"
 )]
 pub(crate) struct Ticket {
     id: TicketId,
@@ -183,13 +173,13 @@ impl InRepoDB {
     pub fn get_next_ticket_id(&self) -> Option<TicketId> {
         let last_id = self.tickets.last_key_value().map(|(id, _)| id)?;
         let next_id = last_id.to_string().get(1..)?.parse::<u16>().unwrap() + 1;
-        Some(TicketId(format!("T{:04}", next_id)))
+        Some(TicketId(format!("T{next_id:04}")))
     }
 
     pub fn get_next_project_id(&self) -> Option<ProjectId> {
         let last_id = self.projects.last_key_value().map(|(id, _)| id)?;
         let next_id = last_id.to_string().get(1..)?.parse::<u16>().unwrap() + 1;
-        Some(ProjectId(format!("P{:04}", next_id)))
+        Some(ProjectId(format!("P{next_id:04}")))
     }
 }
 

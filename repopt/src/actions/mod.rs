@@ -27,7 +27,7 @@ pub(super) fn list_all_tickets(
         iter = iter.with_type(ticket_type);
     }
     let out_string = output_formatter.try_format_multiple(&iter.collect::<Vec<&Ticket>>())?;
-    println!("{}", out_string);
+    println!("{out_string}");
     Ok(())
 }
 
@@ -39,7 +39,7 @@ pub(super) fn show_ticket(id: String) -> Result<()> {
     let ticket = in_repo_db.get_ticket(&id.into());
     if let Some(ticket) = ticket {
         let out_string = output_formatter.try_format_single(ticket)?;
-        println!("{}", out_string);
+        println!("{out_string}");
     } else {
         return Err(From::from("Ticket not found."));
     };
@@ -69,7 +69,7 @@ pub(super) fn add_new_ticket(
         .unwrap_or_else(get_user_input::get_title)?;
     let status = status
         .map(Ok)
-        .unwrap_or_else(|| get_user_input::get_ticket_status(TicketStatusTypes::All))?;
+        .unwrap_or_else(|| get_user_input::get_ticket_status(&TicketStatusTypes::All))?;
     let ticket_type = ticket_type
         .map(Ok)
         .unwrap_or_else(get_user_input::get_ticket_type)?;
@@ -125,7 +125,7 @@ pub(super) fn close_ticket() -> Result<()> {
 pub(super) fn reopen_ticket() -> Result<()> {
     println!("Reopening a ticket");
     let mut ticket = get_user_input::select_closed_ticket()?;
-    let status = get_user_input::get_ticket_status(TicketStatusTypes::OnlyOpen)?;
+    let status = get_user_input::get_ticket_status(&TicketStatusTypes::OnlyOpen)?;
     ticket.reopen(Some(status));
     in_repo_db::verify_and_write(&ticket)?;
     Ok(())

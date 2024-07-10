@@ -39,7 +39,7 @@ pub(super) enum TicketStatusTypes {
     OnlyClosed,
 }
 
-pub(super) fn get_ticket_status(status_types: TicketStatusTypes) -> Result<TicketStatus> {
+pub(super) fn get_ticket_status(status_types: &TicketStatusTypes) -> Result<TicketStatus> {
     let options = match status_types {
         TicketStatusTypes::All => vec!["Backlog", "In Progress", "Closed"],
         TicketStatusTypes::OnlyOpen => vec!["Backlog", "In Progress"],

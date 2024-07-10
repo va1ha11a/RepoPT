@@ -17,5 +17,5 @@ typed-builder = "0.18.2"
 
 [lints.clippy]
 enum_glob_use = "deny"
-#pedantic = "warn"
+pedantic = "warn"
 uninlined_format_args = "warn"
