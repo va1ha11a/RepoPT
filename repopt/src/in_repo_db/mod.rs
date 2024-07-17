@@ -6,6 +6,7 @@ use std::collections::BTreeMap;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 use structs::{InRepoDB, Project, ProjectId, Ticket, TicketId};
 
 use crate::config::CONFIG;
@@ -23,12 +24,19 @@ fn ensure_dir_exists(dir: &Path) -> Result<()> {
     Ok(())
 }
 
+#[derive(Clone)]
 struct IRDBPaths {
     tickets: PathBuf,
     projects: PathBuf,
 }
 
+static IRDB_PATHS: OnceLock<IRDBPaths> = OnceLock::new();
+
 fn get_or_create_irdb_dirs() -> Result<IRDBPaths> {
+    let existing_paths = IRDB_PATHS.get();
+    if let Some(paths) = existing_paths {
+        return Ok(paths.clone());
+    }
     let config = CONFIG.get().ok_or("Config not initialized")?;
     let base_dir = config.irdb_path.clone();
     let tickets_dir = base_dir.join(TICKETS_DIR);
@@ -36,10 +44,12 @@ fn get_or_create_irdb_dirs() -> Result<IRDBPaths> {
     [&base_dir, &tickets_dir, &projects_dir]
         .iter()
         .try_for_each(|dir| ensure_dir_exists(dir))?;
-    Ok(IRDBPaths {
+    let irdb_paths = IRDBPaths {
         tickets: tickets_dir,
         projects: projects_dir,
-    })
+    };
+    let _ = IRDB_PATHS.set(irdb_paths.clone());
+    Ok(irdb_paths)
 }
 
 pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
