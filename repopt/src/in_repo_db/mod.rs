@@ -1,8 +1,10 @@
+mod git_utils;
 pub mod structs;
 mod toml_utils;
 
 use serde::Serialize;
 use std::collections::BTreeMap;
+use std::env;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -38,7 +40,10 @@ fn get_or_create_irdb_dirs() -> Result<IRDBPaths> {
         return Ok(paths.clone());
     }
     let config = CONFIG.get().ok_or("Config not initialized")?;
-    let base_dir = config.irdb_path.clone();
+    let mut base_dir = config.irdb_path.clone();
+    if base_dir.is_relative() {
+        base_dir = git_utils::find_git_root(env::current_dir()?)?.join(base_dir);
+    }
     let tickets_dir = base_dir.join(TICKETS_DIR);
     let projects_dir = base_dir.join(PROJECTS_DIR);
     [&base_dir, &tickets_dir, &projects_dir]
