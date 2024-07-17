@@ -76,16 +76,16 @@ fn collect_projects(project_path: &Path) -> Result<BTreeMap<ProjectId, Project>>
 
 pub(crate) trait IRDBWritableObject: Serialize {
     fn fmt_stub(&self) -> String;
-    fn select_path(&self) -> PathBuf;
+    fn select_path(&self) -> Result<PathBuf>;
 }
 
 impl IRDBWritableObject for Ticket {
     fn fmt_stub(&self) -> String {
         self.id().to_string()
     }
-    fn select_path(&self) -> PathBuf {
-        let irdb_paths = get_or_create_irdb_dirs().unwrap();
-        irdb_paths.tickets
+    fn select_path(&self) -> Result<PathBuf> {
+        let irdb_paths = get_or_create_irdb_dirs()?;
+        Ok(irdb_paths.tickets)
     }
 }
 
@@ -93,16 +93,16 @@ impl IRDBWritableObject for Project {
     fn fmt_stub(&self) -> String {
         self.id().to_string()
     }
-    fn select_path(&self) -> PathBuf {
-        let irdb_paths = get_or_create_irdb_dirs().unwrap();
-        irdb_paths.projects
+    fn select_path(&self) -> Result<PathBuf> {
+        let irdb_paths = get_or_create_irdb_dirs()?;
+        Ok(irdb_paths.projects)
     }
 }
 
 pub(crate) fn verify_and_write<T: IRDBWritableObject>(item: &T) -> Result<()> {
     let toml_string = toml::to_string(item)?;
     let file_name = format!("{}.toml", item.fmt_stub());
-    let save_path = item.select_path();
+    let save_path = item.select_path()?;
 
     let mut file = File::create(save_path.join(file_name))?;
     file.write_all(toml_string.as_bytes())?;
