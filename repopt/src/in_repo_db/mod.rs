@@ -8,18 +8,44 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use structs::{InRepoDB, Project, ProjectId, Ticket, TicketId};
 
-const BASE_DIR: &str = "example_data";
+use crate::config::CONFIG;
+
 const PROJECTS_DIR: &str = "projects";
 const TICKETS_DIR: &str = "tickets";
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
 
+fn ensure_dir_exists(dir: &Path) -> Result<()> {
+    if !dir.exists() {
+        fs::create_dir(dir)?;
+    }
+    Ok(())
+}
+
+struct IRDBPaths {
+    tickets: PathBuf,
+    projects: PathBuf,
+}
+
+fn get_or_create_irdb_dirs() -> Result<IRDBPaths> {
+    let config = CONFIG.get().ok_or("Config not initialized")?;
+    let base_dir = config.irdb_path.clone();
+    let tickets_dir = base_dir.join(TICKETS_DIR);
+    let projects_dir = base_dir.join(PROJECTS_DIR);
+    [&base_dir, &tickets_dir, &projects_dir]
+        .iter()
+        .try_for_each(|dir| ensure_dir_exists(dir))?;
+    Ok(IRDBPaths {
+        tickets: tickets_dir,
+        projects: projects_dir,
+    })
+}
+
 pub(super) fn collect_in_repo_db() -> Result<InRepoDB> {
-    let project_path = PathBuf::from(BASE_DIR).join(PROJECTS_DIR);
-    let ticket_path = PathBuf::from(BASE_DIR).join(TICKETS_DIR);
-    let projects = collect_projects(&project_path)?;
-    let tickets = collect_tickets(&ticket_path)?;
+    let irdb_paths = get_or_create_irdb_dirs()?;
+    let projects = collect_projects(&irdb_paths.projects)?;
+    let tickets = collect_tickets(&irdb_paths.tickets)?;
 
     Ok(InRepoDB::new(projects, tickets))
 }
@@ -58,7 +84,8 @@ impl IRDBWritableObject for Ticket {
         self.id().to_string()
     }
     fn select_path(&self) -> PathBuf {
-        PathBuf::from(BASE_DIR).join(TICKETS_DIR)
+        let irdb_paths = get_or_create_irdb_dirs().unwrap();
+        irdb_paths.tickets
     }
 }
 
@@ -67,7 +94,8 @@ impl IRDBWritableObject for Project {
         self.id().to_string()
     }
     fn select_path(&self) -> PathBuf {
-        PathBuf::from(BASE_DIR).join(PROJECTS_DIR)
+        let irdb_paths = get_or_create_irdb_dirs().unwrap();
+        irdb_paths.projects
     }
 }
 

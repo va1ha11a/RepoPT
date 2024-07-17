@@ -2,6 +2,8 @@ mod actions;
 mod in_repo_db;
 mod output_formatter;
 
+use std::path::PathBuf;
+
 use clap::Parser;
 use in_repo_db::structs::{TicketStatus, TicketType};
 
@@ -9,12 +11,14 @@ type Error = Box<dyn std::error::Error>; // replace this with set error types fo
 type Result<T> = std::result::Result<T, Error>;
 
 mod config {
-    use std::sync::OnceLock;
+    use std::{path::PathBuf, sync::OnceLock};
 
     use crate::output_formatter::OutputFormatter;
 
+    #[derive(Debug)]
     pub(crate) struct Config {
         pub formatter: OutputFormatter,
+        pub irdb_path: PathBuf,
     }
 
     pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
@@ -25,6 +29,9 @@ mod config {
 struct Cli {
     #[arg(long, default_value = "json", global = true)]
     format: output_formatter::OutputFormatter,
+
+    #[arg(long, value_parser = clap::value_parser!(PathBuf), global = true, default_value = ".irdb")]
+    irdb_path: PathBuf,
 
     #[command(subcommand)]
     base_command: BaseCommands,
@@ -88,6 +95,7 @@ fn main() -> Result<()> {
 
     let _ = config::CONFIG.set(config::Config {
         formatter: cli.format,
+        irdb_path: cli.irdb_path,
     });
 
     match cli.base_command {
