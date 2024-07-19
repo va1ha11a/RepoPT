@@ -4,7 +4,9 @@ use get_user_input::TicketStatusTypes;
 
 use crate::config::CONFIG;
 use crate::in_repo_db;
-use crate::in_repo_db::structs::{Project, Ticket, TicketFilters, TicketStatus, TicketType};
+use crate::in_repo_db::structs::{
+    Project, ProjectId, Ticket, TicketFilters, TicketStatus, TicketType,
+};
 use crate::output_formatter::GenerateOutputFormat;
 use std::collections::HashMap;
 
@@ -14,6 +16,7 @@ type Result<T> = std::result::Result<T, Error>;
 pub(super) fn list_all_tickets(
     filter_on_status: Option<TicketStatus>,
     filter_on_type: Option<TicketType>,
+    for_project: Option<ProjectId>,
 ) -> Result<()> {
     let config = CONFIG.get().ok_or("Config not initialized")?;
     let in_repo_db = in_repo_db::collect_in_repo_db();
@@ -24,6 +27,9 @@ pub(super) fn list_all_tickets(
     }
     if let Some(ticket_type) = filter_on_type {
         iter = iter.with_type(ticket_type);
+    }
+    if let Some(project) = for_project {
+        iter = iter.for_project(project);
     }
     let out_string = config
         .formatter
