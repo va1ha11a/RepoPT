@@ -51,7 +51,7 @@ impl From<Project> for ProjectStub {
 }
 
 #[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Display, Clone)]
+#[derive(Serialize, Deserialize, Debug, Display, Clone, PartialEq, Eq)]
 pub(crate) struct ProjectStub {
     id: ProjectId,
 }
@@ -198,6 +198,10 @@ where
 
     fn with_type(self, ticket_type: TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
         Box::new(self.filter(move |ticket| ticket.ticket_type == ticket_type))
+    }
+
+    fn for_project(self, project: ProjectId) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.project.id == project))
     }
 }
 

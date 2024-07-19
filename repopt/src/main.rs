@@ -5,7 +5,7 @@ mod output_formatter;
 use std::path::PathBuf;
 
 use clap::Parser;
-use in_repo_db::structs::{TicketStatus, TicketType};
+use in_repo_db::structs::{ProjectId, TicketStatus, TicketType};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
 type Result<T> = std::result::Result<T, Error>;
@@ -88,6 +88,8 @@ struct ListOptions {
     status: Option<TicketStatus>,
     #[clap(long, value_enum)]
     ticket_type: Option<TicketType>,
+    #[clap(long, value_parser = clap::value_parser!(ProjectId))]
+    project: Option<ProjectId>,
 }
 
 fn main() -> Result<()> {
@@ -109,7 +111,7 @@ fn main() -> Result<()> {
             actions::add_new_project(project_options.name, project_options.description)
         }
         BaseCommands::List(options) => {
-            actions::list_all_tickets(options.status, options.ticket_type)
+            actions::list_all_tickets(options.status, options.ticket_type, options.project)
         }
         BaseCommands::Show { id } => actions::show_ticket(id),
         BaseCommands::Edit => unimplemented!(),

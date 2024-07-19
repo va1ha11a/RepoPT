@@ -1,0 +1,7 @@
+id = "T0007"
+title = "githook close ticket on branch PR"
+status = "Backlog"
+type = "Feature"
+
+[project]
+id = "P0003"
