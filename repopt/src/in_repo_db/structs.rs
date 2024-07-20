@@ -1,61 +1,14 @@
 use clap::ValueEnum;
 use derive_more::{Display, From};
+pub(crate) use project::{Project, ProjectDescription, ProjectId, ProjectName};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 use typed_builder::TypedBuilder;
 
-#[derive(
-    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
-)]
-#[from(forward)]
-pub(crate) struct ProjectId(String);
-#[derive(
-    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
-)]
-#[from(forward)]
-pub(crate) struct ProjectName(String);
-#[derive(
-    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
-)]
-#[from(forward)]
-pub(crate) struct ProjectDescription(String);
+pub(crate) mod project;
 
-#[derive(TypedBuilder)]
-#[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Clone, Display)]
-#[display(fmt = "Project ID: {id}\nName: {name}\nDescription: {description}")]
-pub(crate) struct Project {
-    id: ProjectId,
-    name: ProjectName,
-    description: ProjectDescription,
-    // Other fields...
-    #[serde(flatten)]
-    extra: HashMap<String, Value>,
-}
-
-impl Project {
-    pub(crate) fn id(&self) -> &ProjectId {
-        &self.id
-    }
-
-    pub(crate) fn name(&self) -> &ProjectName {
-        &self.name
-    }
-}
-
-impl From<Project> for ProjectStub {
-    fn from(project: Project) -> Self {
-        ProjectStub { id: project.id }
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Serialize, Deserialize, Debug, Display, Clone, PartialEq, Eq)]
-pub(crate) struct ProjectStub {
-    id: ProjectId,
-}
-
+// ###### Ticket Section ######
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketStatus {
     #[display(fmt = "Backlog")]
@@ -95,6 +48,20 @@ pub(crate) struct TicketId(String);
 )]
 #[from(forward)]
 pub(crate) struct TicketTitle(String);
+
+#[allow(dead_code)]
+#[derive(Serialize, Deserialize, Debug, Display, Clone, PartialEq, Eq)]
+pub(crate) struct ProjectStub {
+    id: ProjectId,
+}
+
+impl From<Project> for ProjectStub {
+    fn from(project: Project) -> Self {
+        ProjectStub {
+            id: project.id().to_owned(),
+        }
+    }
+}
 
 #[derive(TypedBuilder, Serialize, Deserialize, Debug, Clone, Display)]
 #[display(
@@ -140,6 +107,31 @@ impl Ticket {
     }
 }
 
+pub(crate) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
+where
+    Self: 'a,
+{
+    fn with_status<S>(self, status: S) -> Box<dyn Iterator<Item = &'a Ticket> + 'a>
+    where
+        S: Into<Vec<TicketStatus>>,
+    {
+        let statuses = status.into();
+        Box::new(self.filter(move |ticket| statuses.contains(&ticket.status)))
+    }
+
+    fn with_type(self, ticket_type: TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.ticket_type == ticket_type))
+    }
+
+    fn for_project(self, project: ProjectId) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
+        Box::new(self.filter(move |ticket| ticket.project.id == project))
+    }
+}
+
+// Implement the trait for all iterators that return a ticket reference with the same lifetime
+impl<'a, T> TicketFilters<'a> for T where T: Iterator<Item = &'a Ticket> + 'a {}
+
+// ###### InRepoDB Section ######
 #[derive(Deserialize, Debug)]
 pub(crate) struct InRepoDB {
     projects: BTreeMap<ProjectId, Project>,
@@ -183,30 +175,6 @@ impl InRepoDB {
         Some(ProjectId(format!("P{next_id:04}")))
     }
 }
-
-pub(crate) trait TicketFilters<'a>: Iterator<Item = &'a Ticket> + Sized
-where
-    Self: 'a,
-{
-    fn with_status<S>(self, status: S) -> Box<dyn Iterator<Item = &'a Ticket> + 'a>
-    where
-        S: Into<Vec<TicketStatus>>,
-    {
-        let statuses = status.into();
-        Box::new(self.filter(move |ticket| statuses.contains(&ticket.status)))
-    }
-
-    fn with_type(self, ticket_type: TicketType) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
-        Box::new(self.filter(move |ticket| ticket.ticket_type == ticket_type))
-    }
-
-    fn for_project(self, project: ProjectId) -> Box<dyn Iterator<Item = &'a Ticket> + 'a> {
-        Box::new(self.filter(move |ticket| ticket.project.id == project))
-    }
-}
-
-// Implement the trait for all iterators that return a ticket reference with the same lifetime
-impl<'a, T> TicketFilters<'a> for T where T: Iterator<Item = &'a Ticket> + 'a {}
 
 #[cfg(test)]
 mod tests;

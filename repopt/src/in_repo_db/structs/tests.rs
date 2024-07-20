@@ -2,24 +2,24 @@ use super::*;
 
 fn setup_in_repo_db_one() -> InRepoDB {
     let project_id = ProjectId("P0001".to_string());
-    let project = Project {
-        id: project_id.clone(),
-        name: "Test Project".into(),
-        description: "Test Description".into(),
-        extra: HashMap::new(),
-    };
+    let project = Project::builder()
+        .id(project_id.clone())
+        .name("Test Project".into())
+        .description("Test Description".into())
+        .extra(HashMap::new())
+        .build();
 
     let ticket_id = TicketId("T0001".to_string());
-    let ticket = Ticket {
-        id: ticket_id.clone(),
-        title: "Test Ticket".into(),
-        status: TicketStatus::Backlog,
-        ticket_type: TicketType::Bug,
-        project: ProjectStub {
+    let ticket = Ticket::builder()
+        .id(ticket_id.clone())
+        .title("Test Ticket".into())
+        .status(TicketStatus::Backlog)
+        .ticket_type(TicketType::Bug)
+        .project(ProjectStub {
             id: project_id.clone(),
-        },
-        extra: HashMap::new(),
-    };
+        })
+        .extra(HashMap::new())
+        .build();
 
     InRepoDB {
         projects: BTreeMap::from([(project_id, project)]),
