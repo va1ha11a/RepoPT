@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use typed_builder::TypedBuilder;
+
 #[derive(Display, Serialize, Deserialize, Debug, PartialEq, Eq, ValueEnum, Clone)]
 pub(crate) enum TicketStatus {
     #[display(fmt = "Backlog")]
