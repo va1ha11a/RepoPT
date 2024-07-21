@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::*;
 
 fn setup_in_repo_db_one() -> InRepoDB {
@@ -15,9 +17,7 @@ fn setup_in_repo_db_one() -> InRepoDB {
         .title("Test Ticket".into())
         .status(TicketStatus::Backlog)
         .ticket_type(TicketType::Bug)
-        .project(ProjectStub {
-            id: project_id.clone(),
-        })
+        .project(ProjectStub::from(&project))
         .extra(HashMap::new())
         .build();
 

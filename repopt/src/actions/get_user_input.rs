@@ -65,7 +65,7 @@ pub(super) fn get_project_id() -> Result<ProjectStub> {
         .into_iter()
         .find(|project| project.name().to_string() == ans)
         .ok_or("Invalid Project")?;
-    Ok(selected_project.into())
+    Ok(ProjectStub::from(&selected_project))
 }
 
 pub(super) fn select_open_ticket() -> Result<Ticket> {
