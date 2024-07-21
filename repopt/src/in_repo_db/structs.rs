@@ -1,9 +1,10 @@
+pub(crate) mod project;
+pub(crate) mod ticket;
+
 pub(crate) use project::{Project, ProjectDescription, ProjectId, ProjectName};
 use serde::Deserialize;
 use std::collections::BTreeMap;
-pub(crate) mod project;
 pub(crate) use ticket::*;
-pub(crate) mod ticket;
 
 // ###### InRepoDB Section ######
 #[derive(Deserialize, Debug)]
