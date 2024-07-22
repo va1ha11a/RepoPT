@@ -2,6 +2,7 @@ id = "T0002"
 title = "Implement TOML configuration parsing in a much cooler way"
 status = "Backlog"
 type = "Feature"
+description = "Implement TOML configuration parsing in a much cooler way for the IRDB project"
 
 [project]
 id = "P0001"

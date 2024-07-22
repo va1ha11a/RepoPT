@@ -2,6 +2,7 @@ id = "T0003"
 title = "Get some 3 way action"
 status = "InProgress"
 type = "Bug"
+description = "Get some 3 way action for the IRDB project"
 
 [project]
 id = "P0002"

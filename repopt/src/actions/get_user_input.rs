@@ -1,6 +1,7 @@
 use super::{get_projects, list_ticket_by_status};
 use crate::in_repo_db::structs::{
-    ProjectDescription, ProjectName, ProjectStub, Ticket, TicketStatus, TicketTitle, TicketType,
+    ProjectDescription, ProjectName, ProjectStub, Ticket, TicketDescription, TicketStatus,
+    TicketTitle, TicketType,
 };
 use inquire::{Select, Text};
 
@@ -10,6 +11,11 @@ type Result<T> = std::result::Result<T, Error>;
 pub(super) fn get_title() -> Result<TicketTitle> {
     let title = Text::new("Enter Ticket Title:").prompt()?;
     Ok(title.into())
+}
+
+pub(super) fn get_description() -> Result<TicketDescription> {
+    let description = Text::new("Enter Ticket Description:").prompt()?;
+    Ok(description.into())
 }
 
 pub(super) fn get_proj_name() -> Result<ProjectName> {

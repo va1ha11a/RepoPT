@@ -2,6 +2,7 @@ id = "T0005"
 title = "Create git branch on in progress"
 status = "Backlog"
 type = "Feature"
+description = "Create git branch when moving a ticket to in progress for the IRDB project"
 
 [project]
 id = "P0003"

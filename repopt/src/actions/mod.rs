@@ -64,6 +64,7 @@ pub(super) fn init_new_repository() -> Result<()> {
 
 pub(super) fn add_new_ticket(
     title: Option<String>,
+    description: Option<String>,
     status: Option<TicketStatus>,
     ticket_type: Option<TicketType>,
 ) -> Result<()> {
@@ -71,6 +72,7 @@ pub(super) fn add_new_ticket(
     let project_id = get_user_input::get_project_id()?;
 
     let title = title.map_or_else(get_user_input::get_title, |t| Ok(t.into()))?;
+    let description = description.map_or_else(get_user_input::get_description, |t| Ok(t.into()))?;
     let status = status.map_or_else(
         || get_user_input::get_ticket_status(&TicketStatusTypes::All),
         Ok,
@@ -83,6 +85,7 @@ pub(super) fn add_new_ticket(
             .unwrap_or("T0001".to_owned().into()))
         .project(project_id)
         .title(title)
+        .description(description)
         .status(status)
         .ticket_type(ticket_type)
         .extra(HashMap::new())
