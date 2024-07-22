@@ -46,6 +46,12 @@ pub(crate) struct TicketId(pub String);
 #[from(forward)]
 pub(crate) struct TicketTitle(String);
 
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Clone, Hash, Display, From, PartialOrd, Ord,
+)]
+#[from(forward)]
+pub(crate) struct TicketDescription(String);
+
 #[allow(dead_code)]
 #[derive(Serialize, Deserialize, Debug, Display, Clone, PartialEq, Eq)]
 pub(crate) struct ProjectStub {
@@ -68,6 +74,7 @@ impl From<&Project> for ProjectStub {
 pub(crate) struct Ticket {
     id: TicketId,
     title: TicketTitle,
+    description: TicketDescription,
     status: TicketStatus,
     #[serde(rename = "type")]
     ticket_type: TicketType,

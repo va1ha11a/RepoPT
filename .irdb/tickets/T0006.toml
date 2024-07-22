@@ -2,6 +2,7 @@ id = "T0006"
 title = "Add ticket update history"
 status = "Backlog"
 type = "Feature"
+description = "Add ticket update history to the IRDB project"
 
 [project]
 id = "P0003"

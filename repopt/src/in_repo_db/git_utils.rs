@@ -1,4 +1,3 @@
-use gix;
 use std::path::{Path, PathBuf};
 
 type Error = Box<dyn std::error::Error>; // replace this with set error types for production code.
@@ -9,7 +8,7 @@ pub(super) fn find_git_root<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
     Ok(repo
         .git_dir()
         .parent()
-        .ok_or_else(|| "Git root not found")?
+        .ok_or("Git root not found")?
         .to_path_buf()
         .canonicalize()?)
 }

@@ -77,6 +77,8 @@ struct AddTicketOptions {
     #[clap(long, value_enum)]
     title: Option<String>,
     #[clap(long, value_enum)]
+    description: Option<String>,
+    #[clap(long, value_enum)]
     status: Option<TicketStatus>,
     #[clap(long, value_enum)]
     ticket_type: Option<TicketType>,
@@ -104,6 +106,7 @@ fn main() -> Result<()> {
         BaseCommands::Init => actions::init_new_repository(),
         BaseCommands::Add(AddOptions::Ticket(ticket_options)) => actions::add_new_ticket(
             ticket_options.title,
+            ticket_options.description,
             ticket_options.status,
             ticket_options.ticket_type,
         ),

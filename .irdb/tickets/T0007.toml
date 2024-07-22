@@ -2,6 +2,7 @@ id = "T0007"
 title = "githook close ticket on branch PR"
 status = "Backlog"
 type = "Feature"
+description = "Create a githook that closes a ticket when a branch is merged into master for the IRDB project"
 
 [project]
 id = "P0003"

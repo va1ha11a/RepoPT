@@ -2,6 +2,7 @@ id = "T0004"
 title = "4 is a crowd"
 status = "Closed"
 type = "Bug"
+description = "4 is a crowd for the IRDB project"
 
 [project]
 id = "P0002"

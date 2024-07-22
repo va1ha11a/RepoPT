@@ -15,6 +15,7 @@ fn setup_in_repo_db_one() -> InRepoDB {
     let ticket = Ticket::builder()
         .id(ticket_id.clone())
         .title("Test Ticket".into())
+        .description("Test Description".into())
         .status(TicketStatus::Backlog)
         .ticket_type(TicketType::Bug)
         .project(ProjectStub::from(&project))
